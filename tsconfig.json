@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": false,
+    "isolatedModules": true,
+    "importsNotUsedAsValues": "error",
+    "noImplicitReturns": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist/"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/__tests__/**"],
+  "compileOnSave": true
+}

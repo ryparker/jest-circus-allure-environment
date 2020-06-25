@@ -1,0 +1,32 @@
+{
+  "name": "jest-circus-allure-reporter",
+  "version": "1.0.0",
+  "repository": "https://ryparker@github.com/ryparker/jest-circus-allure-reporter.git",
+  "author": "Ryan Parker <ryan.parker3@outlook.com>",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "lint": "xo .",
+    "fix": "xo . --fix"
+  },
+  "dependencies": {
+    "@jest/reporters": "^26.1.0",
+    "allure-js-commons": "^2.0.0-beta.7",
+    "jest-circus": "^26.1.0",
+    "jest-environment-node": "^26.1.0",
+    "strip-ansi": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/allure-js-commons": "^0.0.1",
+    "@types/jest": "^26.0.3",
+    "@types/node": "^14.0.14",
+    "eslint-plugin-jest": "^23.17.1",
+    "jest": "^26.1.0",
+    "typescript": "^3.9.5",
+    "xo": "^0.32.0"
+  }
+}
