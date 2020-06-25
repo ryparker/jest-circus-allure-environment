@@ -1,0 +1,1 @@
+# jest-circus-allure-reporter
