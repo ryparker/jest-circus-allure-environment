@@ -20,24 +20,23 @@ export default class AllureEnvironment extends NodeEnvironment {
 
   constructor(config: Config.ProjectConfig) {
     super(config)
-    console.log(`constructor arguments: ${JSON.stringify(arguments, null, 2)}`)
+    console.log(`constructor arguments: ${arguments}`)
     // this.allure = new AllureRuntime({ ...config, resultsDir: 'allure-results' })
   }
 
   async setup() {
     await super.setup()
-    console.log(`constructor arguments: ${JSON.stringify(arguments, null, 2)}`)
+    console.log(`setup arguments: ${arguments}`)
   }
 
   async teardown() {
     await super.teardown()
-    console.log(`constructor arguments: ${JSON.stringify(arguments, null, 2)}`)
+    console.log(`teardown arguments: ${arguments}`)
   }
 
   handleTestEvent(event: Event, state: State) {
-    console.log(
-      `handleTestEvent arguments: ${JSON.stringify(arguments, null, 2)}`
-    )
+    console.log(event.name)
+    // console.log(`handleTestEvent arguments: ${arguments}`)
     switch (event.name) {
       case 'finish_describe_definition':
         // this.allure.startSuite(event.blockName)
