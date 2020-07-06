@@ -11,10 +11,13 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "rimraf allure-results && yarn build && jest",
-    "lint": "xo .",
-    "fix": "xo . --fix"
+    "lint": "xo src",
+    "fix": "xo src --fix"
   },
   "xo": {
+    "globals": [
+      "allure"
+    ],
     "extends": [
       "plugin:jest/recommended"
     ]

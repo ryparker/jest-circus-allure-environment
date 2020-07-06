@@ -7,8 +7,7 @@ import {
 	ExecutableItemWrapper,
 	Status,
 	StepInterface,
-	isPromise,
-	Stage
+	isPromise
 } from 'allure-js-commons';
 
 import type AllureReporter from './allure-reporter';
