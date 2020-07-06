@@ -3,20 +3,19 @@ import NodeEnvironment from 'jest-environment-node';
 import type {EnvironmentContext} from '@jest/environment';
 import AllureReporter from './allure-reporter';
 import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
-import type JestAllureInterface from './allure-interface';
+// Import type JestAllureInterface from './allure-interface';
 
-export interface Global extends NodeJS.Global {
-	allure: JestAllureInterface;
-}
+// export interface Global extends NodeJS.Global {
+// 	allure: JestAllureInterface;
+// }
 
-declare global {
-	namespace NodeJS {
-		interface Global {
-			allure: JestAllureInterface;
-		}
-	}
-}
-
+// declare global {
+// 	namespace NodeJS {
+// 		interface Global {
+// 			allure: JestAllureInterface;
+// 		}
+// 	}
+// }
 export default class CircusEnvironment extends NodeEnvironment {
 	private readonly reporter: AllureReporter;
 	private readonly testPath: string;
