@@ -32,13 +32,13 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	}
 
 	async setup() {
-		await super.setup();
+		return super.setup();
 	}
 
 	async teardown() {
 		this.global.allure = null;
 
-		await super.teardown();
+		return super.teardown();
 	}
 
 	handleTestEvent(event: Circus.Event, state: Circus.State) {
