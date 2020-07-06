@@ -167,7 +167,7 @@ export default class AllureReporter {
 
 		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
 
-		const isSnapshotFailure = error.matcherResult.name === 'toMatchSnapshot';
+		const isSnapshotFailure = error.matcherResult?.name === 'toMatchSnapshot';
 
 		let message: string;
 		let trace: string;
