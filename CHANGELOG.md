@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.3.0...v0.4.0) (2020-07-06)
+
+
+### Features
+
+* **project wide:** added support for the global "allure" report helper. Added better types support ([3cc3adc](https://github.com/ryparker/jest-circus-allure-environment/commit/3cc3adc70364a645b3d1051fa5a9210f68decc06))
+
 # [0.3.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.2.0...v0.3.0) (2020-07-06)
 
 
