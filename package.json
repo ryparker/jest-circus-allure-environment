@@ -1,19 +1,22 @@
 {
-  "name": "jest-circus-allure-reporter",
+  "name": "jest-circus-allure-environment",
   "version": "0.0.2",
-  "repository": "https://ryparker@github.com/ryparker/jest-circus-allure-reporter.git",
+  "repository": "https://ryparker@github.com/ryparker/jest-circus-allure-environment.git",
   "author": "Ryan Parker <ryan.parker3@outlook.com>",
   "license": "MIT",
   "files": [
     "dist"
   ],
-  "main": "dist/index",
-  "types": "dist/index.d.ts",
+  "main": "./dist",
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "rimraf allure-results && yarn build && jest",
     "lint": "xo src",
     "fix": "xo src --fix"
+  },
+  "jest": {
+    "testEnvironment": "./dist",
+    "testRunner": "jest-circus/runner"
   },
   "xo": {
     "globals": [
@@ -26,6 +29,16 @@
       "plugin:jest/recommended"
     ]
   },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/git",
+      "@semantic-release/github",
+      "@semantic-release/npm"
+    ]
+  },
   "dependencies": {
     "@jest/environment": "^26.1.0",
     "@jest/reporters": "^26.1.0",
@@ -33,9 +46,7 @@
     "allure-js-commons": "^2.0.0-beta.7",
     "crypto": "^1.0.1",
     "jest-circus": "^26.1.0",
-    "jest-docblock": "^26.0.0",
     "jest-environment-node": "^26.1.0",
-    "lodash": "^4.17.15",
     "prettier": "^2.0.5",
     "pretty-format": "^26.1.0",
     "strip-ansi": "^6.0.0"
@@ -43,7 +54,6 @@
   "devDependencies": {
     "@types/allure-js-commons": "^0.0.1",
     "@types/jest": "^26.0.3",
-    "@types/lodash": "^4.14.157",
     "@types/node": "^14.0.14",
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
@@ -54,12 +64,23 @@
     "typescript": "^3.9.6",
     "xo": "^0.32.1"
   },
+  "engines": {
+    "node": ">=12.x"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "engines": {
-    "node": ">=12.x"
-  }
+  "keywords": [
+    "jest",
+    "circus",
+    "reporter",
+    "allure",
+    "environment",
+    "detailed",
+    "reports",
+    "collect",
+    "analyze"
+  ]
 }

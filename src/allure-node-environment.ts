@@ -3,20 +3,8 @@ import NodeEnvironment from 'jest-environment-node';
 import type {EnvironmentContext} from '@jest/environment';
 import AllureReporter from './allure-reporter';
 import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
-// Import type JestAllureInterface from './allure-interface';
 
-// export interface Global extends NodeJS.Global {
-// 	allure: JestAllureInterface;
-// }
-
-// declare global {
-// 	namespace NodeJS {
-// 		interface Global {
-// 			allure: JestAllureInterface;
-// 		}
-// 	}
-// }
-export default class CircusEnvironment extends NodeEnvironment {
+export default class AllureNodeEnvironment extends NodeEnvironment {
 	private readonly reporter: AllureReporter;
 	private readonly testPath: string;
 	private readonly docblockPragmas?: Record<string, string | string[]>;
@@ -29,23 +17,32 @@ export default class CircusEnvironment extends NodeEnvironment {
 		this.docblockPragmas = context.docblockPragmas;
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
 
+		if (this.testPath.includes('tests/')) {
+			this.testPath = this.testPath.split('tests/')[1];
+		}
+
+		if (this.testPath.includes('__tests__/')) {
+			this.testPath = this.testPath.split('__tests__/')[1];
+		}
+
 		this.reporter = new AllureReporter(new AllureRuntime(allureConfig));
 
+		this.global.allure = this.reporter.getImplementation();
 		console.log(' this.docblockPragmas:', this.docblockPragmas);
 	}
 
 	async setup() {
 		await super.setup();
-
-		this.global.allure = this.reporter.getImplementation();
 	}
 
 	async teardown() {
+		this.global.allure = null;
+
 		await super.teardown();
 	}
 
 	handleTestEvent(event: Circus.Event, state: Circus.State) {
-		console.log(`Event: ${event.name}`);
+		// Console.log(`Event: ${event.name}`);
 		switch (event.name) {
 			case 'setup':
 				break;
@@ -80,7 +77,6 @@ export default class CircusEnvironment extends NodeEnvironment {
 				this.reporter.endHook(event.error ?? event.hook.asyncError);
 				break;
 			case 'test_fn_start':
-				console.log('this.testPath:', this.testPath);
 				this.reporter.startCase(event.test, state, this.testPath);
 				break;
 			case 'test_fn_success':
