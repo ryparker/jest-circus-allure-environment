@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.0...v0.4.1) (2020-07-06)
+
+
+### Bug Fixes
+
+* **allure-reporter.ts:** fixed Snapshot failure handling ([4922775](https://github.com/ryparker/jest-circus-allure-environment/commit/492277591666964d6f60ad13eee021e60eca47ed))
+
 # [0.4.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.3.0...v0.4.0) (2020-07-06)
 
 
