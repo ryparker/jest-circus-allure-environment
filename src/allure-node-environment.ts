@@ -77,6 +77,9 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				this.reporter.endHook();
 				break;
 			case 'hook_failure':
+				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
+				// console.log('TEST_FN_FAILURE HOOK.ASYNCERROR:', event.hook.asyncError);
+
 				this.reporter.endHook(event.error ?? event.hook.asyncError);
 				break;
 			case 'test_fn_start':
@@ -86,10 +89,19 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				this.reporter.passTestCase(event.test, state, this.testPath);
 				break;
 			case 'test_fn_failure':
-				console.log('TEST_FN_FAILURE:', event.error);
+				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
+				// console.log('TEST_FN_FAILURE TEST.ERRORS:', event.test.errors);
+				// console.log('TEST_FN_FAILURE TEST.ASYNCERROR:', event.test.asyncError);
+
 				this.reporter.failTestCase(event.test, state, this.testPath, event.error ?? event.test.asyncError);
 				break;
 			case 'test_done':
+				// Console.log('TEST_DONE TEST.ERRORS:', event.test.errors);
+				if (event.test.errors) {
+					this.reporter.failTestCase(event.test, state, this.testPath, event.test.errors[0] ?? event.test.asyncError);
+				}
+
+				// Console.log('TEST_DONE TEST.ASYNCERROR:', event.test.asyncError);
 				break;
 			case 'run_describe_finish':
 				this.reporter.endSuite();
@@ -102,7 +114,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				console.log('ERROR EVENT:', event.error);
 				break;
 			default:
-				console.log('unhandled event:', event);
+				console.log('UNHANDLED EVENT:', event);
 				break;
 		}
 	}

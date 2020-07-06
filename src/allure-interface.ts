@@ -43,6 +43,7 @@ export default class JestAllureInterface extends Allure {
 	}
 
 	public tag(tag: string) {
+		console.log('Allure Interface: tag() called');
 		this.currentTest.addLabel(LabelName.TAG, tag);
 	}
 

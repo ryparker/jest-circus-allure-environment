@@ -159,10 +159,29 @@ export default class AllureReporter {
 			}
 		}
 
-		console.log('ERROR FOUND:', error);
+		// If (error.matcherResult) {
+		// 	console.log('error.matcherResult:', error.matcherResult);
+		// } else {
+		// 	console.log('error:', error);
+		// }
+
 		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
-		const message = stripAnsi(error.message);
-		const trace = stripAnsi(error.stack).replace(message, '');
+
+		const isSnapshotFailure = error.matcherResult.name === 'toMatchSnapshot';
+
+		let message: string;
+		let trace: string;
+
+		if (isSnapshotFailure) {
+			const [matcherHint, ...snapshotDiff] = stripAnsi(error.matcherResult.message()).split('@@');
+
+			message = matcherHint;
+			trace = snapshotDiff.join('');
+			// Console.log({message, trace});
+		} else {
+			message = stripAnsi(error.message);
+			trace = stripAnsi(error.stack).replace(message, '');
+		}
 
 		this.endTest(status, {message, trace});
 	}
