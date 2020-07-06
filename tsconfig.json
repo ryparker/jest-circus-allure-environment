@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
-    "target": "esnext",
+    "lib": ["es2019"],
+    "target": "es2019",
     "module": "commonjs",
     "moduleResolution": "node",
     "declaration": false,
@@ -11,6 +11,7 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["node", "jest", "allure-js-commons", "lodash"],
     "outDir": "dist/"
   },
   "include": ["src/**/*"],

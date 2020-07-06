@@ -1,0 +1,47 @@
+name: Lint-Build-Test-Publish
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  pre-release-checks:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: yarn install
+      - name: Lint
+        run: yarn lint
+      # - name: Build & Test
+      #   run: yarn test
+
+  publish-github-package-repo:
+    needs: [pre-release-checks]
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node 12.x with registry access
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://npm.pkg.github.com/
+      - run: yarn install --ignore-engines
+      - name: Build
+        run: yarn build
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Publish to Github Package Repo
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: yarn run semantic-release
