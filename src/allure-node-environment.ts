@@ -1,5 +1,5 @@
 import type {Config, Circus} from '@jest/types';
-import NodeEnvironment from 'jest-environment-node';
+import NodeEnvironment = require('jest-environment-node');
 import type {EnvironmentContext} from '@jest/environment';
 import AllureReporter from './allure-reporter';
 import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
@@ -28,7 +28,10 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 		this.reporter = new AllureReporter(new AllureRuntime(allureConfig));
 
 		this.global.allure = this.reporter.getImplementation();
-		console.log(' this.docblockPragmas:', this.docblockPragmas);
+
+		if (this.docblockPragmas === {}) {
+			console.log(this.docblockPragmas);
+		}
 	}
 
 	async setup() {
@@ -36,7 +39,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	}
 
 	async teardown() {
-		this.global.allure = null;
+		// This.global.allure = null;
 
 		return super.teardown();
 	}
@@ -83,6 +86,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				this.reporter.passTestCase(event.test, state, this.testPath);
 				break;
 			case 'test_fn_failure':
+				console.log('TEST_FN_FAILURE:', event.error);
 				this.reporter.failTestCase(event.test, state, this.testPath, event.error ?? event.test.asyncError);
 				break;
 			case 'test_done':
@@ -95,8 +99,10 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			case 'teardown':
 				break;
 			case 'error':
+				console.log('ERROR EVENT:', event.error);
 				break;
 			default:
+				console.log('unhandled event:', event);
 				break;
 		}
 	}

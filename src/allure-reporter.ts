@@ -1,8 +1,8 @@
 import JestAllureInterface from './allure-interface';
 import type * as jest from '@jest/types';
-import stripAnsi from 'strip-ansi';
-import prettier from 'prettier/standalone';
-import parser from 'prettier/parser-typescript';
+import stripAnsi = require('strip-ansi');
+import prettier = require('prettier/standalone');
+import parser = require('prettier/parser-typescript');
 import {
 	AllureGroup,
 	AllureRuntime,
@@ -112,7 +112,7 @@ export default class AllureReporter {
 			this.currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
 		}
 
-		const pathsArray = testPath.split('/').slice(2);
+		const pathsArray = testPath.split('/');
 
 		const [parentSuite, suite, ...subSuites] = pathsArray;
 
@@ -159,6 +159,7 @@ export default class AllureReporter {
 			}
 		}
 
+		console.log('ERROR FOUND:', error);
 		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
 		const message = stripAnsi(error.message);
 		const trace = stripAnsi(error.stack).replace(message, '');

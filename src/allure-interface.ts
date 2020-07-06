@@ -7,7 +7,8 @@ import {
 	ExecutableItemWrapper,
 	Status,
 	StepInterface,
-	isPromise
+	isPromise,
+	LabelName
 } from 'allure-js-commons';
 
 import type AllureReporter from './allure-reporter';
@@ -37,6 +38,18 @@ export default class JestAllureInterface extends Allure {
 		this.reporter.currentExecutable = executable;
 	}
 
+	public label(name: string, value: string) {
+		this.currentTest.addLabel(name, value);
+	}
+
+	public tag(tag: string) {
+		this.currentTest.addLabel(LabelName.TAG, tag);
+	}
+
+	public epic(epic: string) {
+		this.label(LabelName.EPIC, epic);
+	}
+
 	public step<T>(name: string, body: (step: StepInterface) => any): any {
 		const wrappedStep = this.startStep(name);
 		let result;
@@ -64,7 +77,7 @@ export default class JestAllureInterface extends Allure {
 		return result;
 	}
 
-	logStep(
+	public logStep(
 		name: string,
 		status: Status,
 		attachments?: Array<{ name: string; content: string; type: ContentType }>

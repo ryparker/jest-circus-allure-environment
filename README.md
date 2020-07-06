@@ -1,4 +1,4 @@
-# jest-circus-allure-reporter
+# Jest Circus Allure Environment
 
 ![Lint-Build-Test-Publish](https://github.com/ryparker/jest-circus-allure-reporter/workflows/Lint-Build-Test-Publish/badge.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
@@ -18,15 +18,15 @@ A Jest Circus environment for Allure reporting.
 
 ## :rocket: Quick start
 
-1. Add this package
+1. **Add this package**
 
 ```shell
 yarn add --dev jest-circus-allure-environment
 ```
 
-2. Update `jest.config.js`
+2. **Update `jest.config.js`**
 
-See the [official Jest docs](https://jestjs.io/docs/en/configuration#testenvironment-string) for more details.
+_See the [testEnvironment docs](https://jestjs.io/docs/en/configuration#testenvironment-string) for configuration details._
 
 ```JSON
 {
@@ -35,43 +35,54 @@ See the [official Jest docs](https://jestjs.io/docs/en/configuration#testenviron
 }
 ```
 
-3. Run tests
+3. **Run tests**
 
 ```shell
 yarn test
 ```
 
-4. Open the Allure report
+4. **Open the Allure report**
 
 ```shell
 allure serve ./allure-results
 ```
 
-## :recycle: Lifecycle events
+## Allure reporting in your tests
 
-Updated list available [here](https://github.com/facebook/jest/blob/master/packages/jest-types/src/Circus.ts)
+To provide more information in your reports you can call allure from your tests. For types support you'll need some [additional configuration](#typescript--intellisense-setup).
 
-**Bold** items are async test events
+```js
+// simple.test.js
 
-**_Italic_** items are synchronous test events
+test('2 + 3 is 5', () => {
+  allure.epic('Implement addition functionality')
+  allure.tag('Accounting')
 
-0. **_error_**
-1. constructor
-2. setup Fn
-3. **setup**
-4. **_add_hook_**
-5. **_start_describe_definition_**
-6. **_add_test_**
-7. **_finish_describe_definition_**
-8. **run_start** / **test_skip** / **test_todo**
-9. **run_describe_start**
-10. **test_start**
-11. **hook_start**
-12. **hook_success** / **hook_failure**
-13. **test_fn_start**
-14. **test_fn_success** / **test_fn_failure** / **error**
-15. **test_done**
-16. **run_describe_finish**
-17. **run_finish**
-18. **teardown**
-19. teardown Fn
+  expect(2 + 3).toBe(5)
+})
+```
+
+## Typescript & Intellisense setup
+
+1. **Support Typescript & intellisense by loading the module into your `jest.setup.js` file**
+
+
+
+```js
+// jest.setup.js
+
+import 'jest-circus-allure-environment' // Typescript or ESM
+require('jest-circus-allure-environment') // CommonJS
+```
+
+2. **Make sure your `jest.setup.js` file is properly configured.**
+
+_See the [setupFilesAfterEnv docs](https://jestjs.io/docs/en/configuration#setupfilesafterenv-array) for configuration details._
+
+```js
+// jest.config.js
+
+{
+  "setupFilesAfterEnv": ["./jest.setup.js"]
+}
+```

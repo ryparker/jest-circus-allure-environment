@@ -7,7 +7,8 @@
   "files": [
     "dist"
   ],
-  "main": "./dist",
+  "main": "dist",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "rimraf allure-results && yarn build && jest",

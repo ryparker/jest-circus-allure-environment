@@ -6,10 +6,11 @@
     "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,
+    "isolatedModules": true,
     "importsNotUsedAsValues": "error",
+    "esModuleInterop": false,
     "noImplicitReturns": true,
     "strict": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "jest", "allure-js-commons"],
     "outDir": "dist/"
