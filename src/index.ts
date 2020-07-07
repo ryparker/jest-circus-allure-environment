@@ -1,9 +1,8 @@
 export {default} from './allure-node-environment';
 
-import type AllureNodeEnvironment from './allure-node-environment';
-export type {AllureNodeEnvironment};
+export * from 'allure-js-commons';
 
-import type JestAllureInterface from './allure-interface';
+import type JestAllureInterface from './jest-allure-interface';
 
 export type {JestAllureInterface};
 

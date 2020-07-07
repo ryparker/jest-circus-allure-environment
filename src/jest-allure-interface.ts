@@ -8,13 +8,18 @@ import {
 	Status,
 	StepInterface,
 	isPromise,
-	LabelName
+	LabelName,
+	Severity,
+	LinkType
 } from 'allure-js-commons';
 
 import type AllureReporter from './allure-reporter';
 import StepWrapper from './step-wrapper';
 
 export default class JestAllureInterface extends Allure {
+	public jiraUrl = '';
+	public tmsUrl = '';
+
 	constructor(
 		private readonly reporter: AllureReporter,
 		runtime: AllureRuntime
@@ -42,13 +47,47 @@ export default class JestAllureInterface extends Allure {
 		this.currentTest.addLabel(name, value);
 	}
 
+	public severity(severity: Severity) {
+		this.label(LabelName.SEVERITY, severity);
+	}
+
 	public tag(tag: string) {
 		console.log('Allure Interface: tag() called');
 		this.currentTest.addLabel(LabelName.TAG, tag);
 	}
 
+	public owner(owner: string) {
+		this.label(LabelName.OWNER, owner);
+	}
+
+	public lead(lead: string) {
+		this.label(LabelName.LEAD, lead);
+	}
+
 	public epic(epic: string) {
 		this.label(LabelName.EPIC, epic);
+	}
+
+	public feature(feature: string) {
+		this.label(LabelName.FEATURE, feature);
+	}
+
+	public story(story: string) {
+		this.label(LabelName.STORY, story);
+	}
+
+	public issue(name: string) {
+		this.link(this.jiraUrl, name, LinkType.ISSUE);
+	}
+
+	public tms(name: string) {
+		this.link(this.tmsUrl, name, LinkType.TMS);
+	}
+
+	public startStep(name: string): StepWrapper {
+		const allureStep: AllureStep = this.currentExecutable.startStep(name);
+		this.reporter.pushStep(allureStep);
+		return new StepWrapper(this.reporter, allureStep);
 	}
 
 	public step<T>(name: string, body: (step: StepInterface) => any): any {
@@ -94,6 +133,14 @@ export default class JestAllureInterface extends Allure {
 		step.endStep();
 	}
 
+	public description(markdown: string) {
+		this.description(markdown);
+	}
+
+	public descriptionHtml(html: string) {
+		this.descriptionHtml(html);
+	}
+
 	public attachment(
 		name: string,
 		content: Buffer | string,
@@ -118,11 +165,5 @@ export default class JestAllureInterface extends Allure {
 		}
 
 		return this.reporter.currentTest;
-	}
-
-	private startStep(name: string): StepWrapper {
-		const allureStep: AllureStep = this.currentExecutable.startStep(name);
-		this.reporter.pushStep(allureStep);
-		return new StepWrapper(this.reporter, allureStep);
 	}
 }

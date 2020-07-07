@@ -1,12 +1,21 @@
-import type {AllureStep, StepInterface, Stage} from 'allure-js-commons';
+import type {AllureStep, StepInterface, Stage, ContentType} from 'allure-js-commons';
 import {Status} from 'allure-js-commons';
 import type AllureReporter from './allure-reporter';
+// Import {JestAllureInterface} from './allure-interface';
 
 export default class StepWrapper {
-	constructor(private readonly reporter: AllureReporter, private readonly step: AllureStep) { }
+	constructor(private readonly reporter: AllureReporter, private readonly step: AllureStep) {}
+
+	get name() {
+		return this.step.name;
+	}
+
+	set name(name: string) {
+		this.step.name = name;
+	}
 
 	get status() {
-		return this.step.status ?? Status.BROKEN;
+		return this.step.status ?? Status.PASSED;
 	}
 
 	set status(status: Status) {
@@ -19,6 +28,19 @@ export default class StepWrapper {
 
 	set stage(stage: Stage) {
 		this.step.stage = stage;
+	}
+
+	public parameter(name: string, value: string): void {
+		this.step.addParameter(name, value);
+	}
+
+	public attachment(
+		name: string,
+		content: Buffer | string,
+		type: ContentType
+	): void {
+		const file = this.reporter.writeAttachment(content, type);
+		this.step.addAttachment(name, type, file);
 	}
 
 	public startStep(name: string): StepWrapper {

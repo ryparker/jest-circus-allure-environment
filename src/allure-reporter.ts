@@ -1,4 +1,4 @@
-import JestAllureInterface from './allure-interface';
+import JestAllureInterface from './jest-allure-interface';
 import type * as jest from '@jest/types';
 import stripAnsi = require('strip-ansi');
 import prettier = require('prettier/standalone');
@@ -83,10 +83,11 @@ export default class AllureReporter {
 
 			if (error) {
 				this.currentExecutable.status = Status.FAILED;
-				this.currentExecutable.statusDetails = {
-					message: error.message,
-					trace: error.stack
-				};
+
+				const message = stripAnsi(error.message);
+				const trace = stripAnsi(error.stack ?? '').replace(message, '');
+
+				this.currentExecutable.statusDetails = {message, trace};
 			} else {
 				this.currentExecutable.status = Status.PASSED;
 			}
@@ -106,7 +107,7 @@ export default class AllureReporter {
 		this.currentTest.stage = Stage.RUNNING;
 
 		const testFunc = test.fn ? prettier.format(test.fn.toString(), {parser: 'typescript', plugins: [parser]}) : '';
-		this.currentTest.descriptionHtml = `<pre><code>${testFunc}</code></pre>`;
+		this.currentTest.description = `### Test\n\`\`\`TS\n${testFunc}\n\`\`\`\n`;
 
 		if (state.parentProcess?.env?.JEST_WORKER_ID) {
 			this.currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
@@ -153,17 +154,18 @@ export default class AllureReporter {
 			this.startCase(test, state, testPath);
 		} else {
 			const latestStatus = this.currentTest.status;
+
 			// If test already has a failed state, we should not overwrite it
 			if (latestStatus === Status.FAILED || latestStatus === Status.BROKEN) {
 				return;
 			}
 		}
 
-		// If (error.matcherResult) {
-		// 	console.log('error.matcherResult:', error.matcherResult);
-		// } else {
-		// 	console.log('error:', error);
-		// }
+		if (error.matcherResult) {
+			console.log('error.matcherResult:', error.matcherResult);
+		} else {
+			console.log('error:', error);
+		}
 
 		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
 
@@ -180,7 +182,7 @@ export default class AllureReporter {
 			// Console.log({message, trace});
 		} else {
 			message = stripAnsi(error.message);
-			trace = stripAnsi(error.stack).replace(message, '');
+			trace = stripAnsi(error.stack ?? '').replace(message, '');
 		}
 
 		this.endTest(status, {message, trace});
