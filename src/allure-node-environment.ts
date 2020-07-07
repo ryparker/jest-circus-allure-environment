@@ -29,7 +29,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 		this.global.allure = this.reporter.getImplementation();
 
-		if (this.docblockPragmas === {}) {
+		if (this.docblockPragmas) {
 			console.log(this.docblockPragmas);
 		}
 	}

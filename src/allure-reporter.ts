@@ -161,11 +161,11 @@ export default class AllureReporter {
 			}
 		}
 
-		if (error.matcherResult) {
-			console.log('error.matcherResult:', error.matcherResult);
-		} else {
-			console.log('error:', error);
-		}
+		// If (error.matcherResult) {
+		// 	console.log('error.matcherResult:', error.matcherResult);
+		// } else {
+		// 	console.log('error:', error);
+		// }
 
 		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
 

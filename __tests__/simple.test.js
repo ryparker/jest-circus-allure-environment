@@ -12,7 +12,7 @@ test('adds 1 + 2 to equal 3', () => {
 /**
  * @my-custom-pragma above-test2
  */
-test('adds 2 + 2 to equal 4', () => {
+test('Expect an Allure step', () => {
 	allure.logStep('step', 'PASSED');
 	expect(sum(2, 2)).toBe(4);
 });

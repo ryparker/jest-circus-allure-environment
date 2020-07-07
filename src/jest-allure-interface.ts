@@ -27,7 +27,7 @@ export default class JestAllureInterface extends Allure {
 		super(runtime);
 	}
 
-	public get currentExecutable(): ExecutableItemWrapper {
+	public get currentExecutable(): AllureStep | AllureTest | ExecutableItemWrapper {
 		const executable: AllureStep | AllureTest | ExecutableItemWrapper | null =
       this.reporter.currentStep ??
       this.reporter.currentTest ??
@@ -39,7 +39,7 @@ export default class JestAllureInterface extends Allure {
 		return executable;
 	}
 
-	public set currentExecutable(executable: ExecutableItemWrapper) {
+	public set currentExecutable(executable: AllureStep | AllureTest | ExecutableItemWrapper) {
 		this.reporter.currentExecutable = executable;
 	}
 
@@ -52,7 +52,6 @@ export default class JestAllureInterface extends Allure {
 	}
 
 	public tag(tag: string) {
-		console.log('Allure Interface: tag() called');
 		this.currentTest.addLabel(LabelName.TAG, tag);
 	}
 
