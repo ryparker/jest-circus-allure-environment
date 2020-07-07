@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.1...v0.4.2) (2020-07-06)
+
+
+### Bug Fixes
+
+* **allure-reporter.ts:** fixed null pointer exception ([0bbd59a](https://github.com/ryparker/jest-circus-allure-environment/commit/0bbd59ae5ca51c0fe44513bfebf62d271fe4a554))
+
 ## [0.4.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.0...v0.4.1) (2020-07-06)
 
 
