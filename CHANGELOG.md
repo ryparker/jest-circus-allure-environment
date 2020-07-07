@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.2...v0.5.0) (2020-07-07)
+
+
+### Features
+
+* **step-interface:** improved steps interface to support attachments and more ([a84c481](https://github.com/ryparker/jest-circus-allure-environment/commit/a84c4817bbd2bb4f0e428108891bfa7b87bec73e))
+
 ## [0.4.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.1...v0.4.2) (2020-07-06)
 
 
