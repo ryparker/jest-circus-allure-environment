@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.5.0...v0.6.0) (2020-07-07)
+
+
+### Features
+
+* **package-wide:** exporting StepWrapper type and disabled some unnecessary console logs ([5763d91](https://github.com/ryparker/jest-circus-allure-environment/commit/5763d910c3e1a2e5c89c6ae085acab31cd21e190))
+
 # [0.5.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.4.2...v0.5.0) (2020-07-07)
 
 
