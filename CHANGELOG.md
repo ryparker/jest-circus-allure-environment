@@ -1,3 +1,11 @@
+## [0.7.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.0...v0.7.1) (2020-07-08)
+
+
+### Bug Fixes
+
+* reverted environmentInfo feat ([9bf8dd2](https://github.com/ryparker/jest-circus-allure-environment/commit/9bf8dd25468fd3655bea228b6cb4eb553bc637bb))
+* **allure-node-environment:** fixed typo ([d8592ed](https://github.com/ryparker/jest-circus-allure-environment/commit/d8592ede1dd95cd2fc621a2eccb8099e2ba26991))
+
 # [0.7.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.6.1...v0.7.0) (2020-07-08)
 
 
