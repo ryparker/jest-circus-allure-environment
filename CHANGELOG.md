@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.6.1...v0.7.0) (2020-07-08)
+
+
+### Features
+
+* **allurereporter:** accepting environmentInfo and jiraUrl from jest environmentt options ([b2ae7ab](https://github.com/ryparker/jest-circus-allure-environment/commit/b2ae7abb07e21325cf9b6c0adfdee14179be0180))
+
 ## [0.6.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.6.0...v0.6.1) (2020-07-07)
 
 
