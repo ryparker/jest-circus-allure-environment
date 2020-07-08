@@ -27,7 +27,6 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 		this.reporter = new AllureReporter(
 			new AllureRuntime(allureConfig),
-			config.testEnvironmentOptions.environmentInfo,
 			config.testEnvironmentOptions.jiraUrl
 		);
 

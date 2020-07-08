@@ -24,8 +24,7 @@ export default class AllureReporter {
 	private runningTest: AllureTest | null = null;
 	private readonly jiraUrl: string;
 
-	constructor(private readonly allureRuntime: AllureRuntime, environmentInfo: Record<string, string>, jiraUrl: string) {
-		this.environmentInfo(environmentInfo);
+	constructor(private readonly allureRuntime: AllureRuntime, jiraUrl: string) {
 		this.jiraUrl = jiraUrl;
 	}
 
