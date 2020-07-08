@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.6.0...v0.6.1) (2020-07-07)
+
+
+### Bug Fixes
+
+* **console logs:** fixed null docblockPragma console log condition ([bc41d2b](https://github.com/ryparker/jest-circus-allure-environment/commit/bc41d2bbbd21552f8f3b40824063c7184d3d4417))
+
 # [0.6.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.5.0...v0.6.0) (2020-07-07)
 
 
