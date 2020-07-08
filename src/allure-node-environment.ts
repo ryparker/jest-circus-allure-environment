@@ -25,7 +25,11 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
 
-		this.reporter = new AllureReporter(new AllureRuntime(allureConfig), config.testEnvironmentOptions?.enironmentInfo, config.testEnvironmentOptions?.jiraUrl);
+		this.reporter = new AllureReporter(
+			new AllureRuntime(allureConfig),
+			config.testEnvironmentOptions.environmentInfo,
+			config.testEnvironmentOptions.jiraUrl
+		);
 
 		this.global.allure = this.reporter.getImplementation();
 
