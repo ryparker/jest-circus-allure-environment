@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.2...v0.8.0) (2020-07-08)
+
+
+### Features
+
+* **project-wide:** added Jest specific categories, and improved error catching ([5c4ae36](https://github.com/ryparker/jest-circus-allure-environment/commit/5c4ae36c51f67aafcd1190cc6171b76bc7608986))
+
 ## [0.7.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.1...v0.7.2) (2020-07-08)
 
 
