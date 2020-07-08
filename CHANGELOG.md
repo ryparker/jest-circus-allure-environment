@@ -1,3 +1,10 @@
+## [0.7.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.1...v0.7.2) (2020-07-08)
+
+
+### Bug Fixes
+
+* reconnected results dir option ([24df569](https://github.com/ryparker/jest-circus-allure-environment/commit/24df56929996c9ed6dfdc493781a77042a342074))
+
 ## [0.7.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.0...v0.7.1) (2020-07-08)
 
 
