@@ -12,7 +12,9 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 		super(config);
 
-		const allureConfig: IAllureConfig = {resultsDir: config.testEnvironmentOptions.resultsDir ?? 'allure-results'};
+		const allureConfig: IAllureConfig = {
+			resultsDir: config.testEnvironmentOptions.resultsDir ?? 'allure-results'
+		};
 
 		this.docblockPragmas = context.docblockPragmas;
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
@@ -96,17 +98,24 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
 				// console.log('TEST_FN_FAILURE TEST.ERRORS:', event.test.errors);
 				// console.log('TEST_FN_FAILURE TEST.ASYNCERROR:', event.test.asyncError);
-
-				this.reporter.failTestCase(event.test, state, this.testPath, event.error ?? event.test.asyncError);
 				break;
 			case 'test_done':
+				/**
+				 * This is more reliable for error collection. Some failures will only appear
+				 * in this event. E.g. Snapshot test failures. Capturing errors from both
+				 * test_done and test_fn_failure causes the test to be overriden, loosing all
+				 * test context (steps).
+				 *
+				 * A workaround might be to refactor the AllureReporter class by separating
+				 * the endTestCase() from the (status*)TestCase() methods.
+				 */
+
 				if (event.test.errors.length > 0) {
 					this.reporter.failTestCase(event.test, state, this.testPath, event.test.errors[0]);
 				} else {
 					this.reporter.passTestCase(event.test, state, this.testPath);
 				}
 
-				// Console.log('TEST_DONE TEST.ASYNCERROR:', event.test.asyncError);
 				break;
 			case 'run_describe_finish':
 				this.reporter.endSuite();

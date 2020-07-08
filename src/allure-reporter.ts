@@ -1,6 +1,7 @@
 import JestAllureInterface from './jest-allure-interface';
 import type * as jest from '@jest/types';
 import stripAnsi = require('strip-ansi');
+import _ = require('lodash');
 import prettier = require('prettier/standalone');
 import parser = require('prettier/parser-typescript');
 import {
@@ -16,6 +17,8 @@ import {
 	StatusDetails
 } from 'allure-js-commons';
 import {createHash} from 'crypto';
+// Import AnsiUp from 'ansi_up';
+// const ansiUp = new AnsiUp();
 
 export default class AllureReporter {
 	public currentExecutable: ExecutableItemWrapper | null = null;
@@ -26,6 +29,64 @@ export default class AllureReporter {
 
 	constructor(private readonly allureRuntime: AllureRuntime, jiraUrl: string) {
 		this.jiraUrl = jiraUrl;
+
+		this.allureRuntime.writeCategoriesDefinitions([
+			{
+				name: 'Response status failures',
+				description: 'Unexpected API response status code.',
+				messageRegex: '.*toHaveStatusCode.*',
+				matchedStatuses: [
+					Status.FAILED
+				]
+			},
+			{
+				name: 'Response time failures',
+				description: 'API responses that took longer than expected.',
+				messageRegex: '.*toHaveResponseTimeBelow.*',
+				matchedStatuses: [
+					Status.FAILED
+				]
+			},
+			{
+				name: 'JSON schema failures',
+				description: 'An object did not validate against an expected JSON schema.',
+				messageRegex: '.*toMatchSchema.*',
+				matchedStatuses: [
+					Status.FAILED
+				]
+			},
+			{
+				name: 'Snapshot failures',
+				description: 'Snapshot does not match the expected snapshot.',
+				messageRegex: '.*toMatchSnapshot.*',
+				matchedStatuses: [
+					Status.FAILED
+				]
+			},
+			{
+				name: 'Updated JSON schemas',
+				description: 'Tests that have updated a JSON schema.',
+				messageRegex: '.*updated.*schema.*updated.*',
+				matchedStatuses: [
+					Status.PASSED
+				]
+			},
+			{
+				name: 'Updated snapshots',
+				description: 'Tests that have updated a snapshot.',
+				messageRegex: '.*updated.*snapshots.*updated.*',
+				matchedStatuses: [
+					Status.PASSED
+				]
+			},
+			{
+				name: 'Skipped tests',
+				description: 'Tests that were skipped in this run.',
+				matchedStatuses: [
+					Status.SKIPPED
+				]
+			}
+		]);
 	}
 
 	public getImplementation(): JestAllureInterface {
@@ -85,6 +146,7 @@ export default class AllureReporter {
 			this.currentExecutable.stage = Stage.FINISHED;
 
 			if (error) {
+				// Console.log('endHook -> handleError');
 				const {status, message, trace} = this.handleError(error);
 
 				this.currentExecutable.status = status;
@@ -108,8 +170,9 @@ export default class AllureReporter {
 			.digest('hex');
 		this.currentTest.stage = Stage.RUNNING;
 
-		const testFunc = test.fn ? prettier.format(test.fn.toString(), {parser: 'typescript', plugins: [parser]}) : '';
-		this.currentTest.description = `### Test\n\`\`\`TS\n${testFunc}\n\`\`\`\n`;
+		const testFunc = test.fn ? prettier.format(test.fn.toString(), {parser: 'typescript', plugins: [parser]}) : 'Error parsing function';
+
+		this.currentTest.description = `### Test\n\`\`\`typescript\n${testFunc}\n\`\`\`\n`;
 
 		if (state.parentProcess?.env?.JEST_WORKER_ID) {
 			this.currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
@@ -143,7 +206,7 @@ export default class AllureReporter {
 
 	public pendingTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
 		this.startCase(test, state, testPath);
-		this.endTest(Status.SKIPPED, {message: `Test ${test.mode as string}`});
+		this.endTest(Status.SKIPPED, {message: `Test is marked: "${test.mode as string}"`});
 	}
 
 	public failTestCase(
@@ -204,38 +267,47 @@ export default class AllureReporter {
 	}
 
 	private handleError(error: Error | any) {
+		if (Array.isArray(error)) {
+			// Test_done event (consistently?) sends an array of error arrays.
+			error = _.flattenDeep(error)[0];
+		}
+
+		let status = Status.BROKEN;
+		let message = error.name;
+		let trace = error.message;
+
 		if (error.matcherResult) {
-			console.log('error.matcherResult:', error.matcherResult);
-		} else {
-			console.log('error:', error);
+			status = Status.FAILED;
+			const matcherMessage = error.matcherResult.message();
+
+			const [line1, line2, ...restOfMessage] = matcherMessage.split('\n');
+
+			message = [line1, line2].join('\n');
+			trace = restOfMessage.join('\n');
 		}
 
-		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
-
-		const isSnapshotFailure = error.matcherResult?.name === 'toMatchSnapshot';
-
-		let message: string;
-		let trace: string;
-
-		if (isSnapshotFailure) {
-			const [matcherHint, ...snapshotDiff] = stripAnsi(error.matcherResult.message()).split('@@');
-
-			message = matcherHint;
-			trace = snapshotDiff.join('');
-		} else {
-			message = stripAnsi(error.message);
-			trace = stripAnsi(error.stack ?? '').replace(message, '');
+		if (!trace) {
+			trace = error.stack;
 		}
 
-		if (!message && status) {
-			message = status;
-			trace = '';
+		if (!message && trace) {
+			message = trace;
+			trace = error.stack?.replace(message, 'No stack trace provided');
+		}
+
+		if (trace?.includes(message)) {
+			trace = trace?.replace(message, '');
+		}
+
+		if (!message) {
+			message = 'Unformatted error. Expand for more details.';
+			trace = error;
 		}
 
 		return {
 			status,
-			message,
-			trace
+			message: stripAnsi(message),
+			trace: stripAnsi(trace)
 		};
 	}
 
@@ -249,9 +321,4 @@ export default class AllureReporter {
 
 		return testPath;
 	}
-
-	// Private formatErrors(error: Error) {
-	//     error.message = stripAnsi(test.failure.message)
-	//   error['stack-trace'] = stripAnsi(test.failure['stack-trace'])
-	// }
 }

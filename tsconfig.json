@@ -12,7 +12,7 @@
     "noImplicitReturns": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "jest", "allure-js-commons"],
+    "types": ["node", "jest", "allure-js-commons", "lodash"],
     "outDir": "dist/"
   },
   "include": ["src/**/*"],
