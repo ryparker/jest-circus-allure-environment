@@ -12,7 +12,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 		super(config);
 
-		const allureConfig: IAllureConfig = {resultsDir: 'allure-results'};
+		const allureConfig: IAllureConfig = {resultsDir: config.testEnvironmentOptions.resultsDir ?? 'allure-results'};
 
 		this.docblockPragmas = context.docblockPragmas;
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
