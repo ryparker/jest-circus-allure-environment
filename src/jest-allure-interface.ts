@@ -17,14 +17,16 @@ import type AllureReporter from './allure-reporter';
 import StepWrapper from './step-wrapper';
 
 export default class JestAllureInterface extends Allure {
-	public jiraUrl = '';
+	public jiraUrl: string;
 	public tmsUrl = '';
 
 	constructor(
 		private readonly reporter: AllureReporter,
-		runtime: AllureRuntime
+		runtime: AllureRuntime,
+		jiraUrl?: string
 	) {
 		super(runtime);
+		this.jiraUrl = jiraUrl ?? '';
 	}
 
 	public get currentExecutable(): AllureStep | AllureTest | ExecutableItemWrapper {

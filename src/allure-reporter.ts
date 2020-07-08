@@ -22,11 +22,15 @@ export default class AllureReporter {
 	private readonly suites: AllureGroup[] = [];
 	private readonly steps: AllureStep[] = [];
 	private runningTest: AllureTest | null = null;
+	private readonly jiraUrl: string;
 
-	constructor(private readonly allureRuntime: AllureRuntime) { }
+	constructor(private readonly allureRuntime: AllureRuntime, environmentInfo: Record<string, string>, jiraUrl: string) {
+		this.environmentInfo(environmentInfo);
+		this.jiraUrl = jiraUrl;
+	}
 
 	public getImplementation(): JestAllureInterface {
-		return new JestAllureInterface(this, this.allureRuntime);
+		return new JestAllureInterface(this, this.allureRuntime, this.jiraUrl);
 	}
 
 	get currentSuite(): AllureGroup | null {
@@ -82,10 +86,9 @@ export default class AllureReporter {
 			this.currentExecutable.stage = Stage.FINISHED;
 
 			if (error) {
-				this.currentExecutable.status = Status.FAILED;
+				const {status, message, trace} = this.handleError(error);
 
-				const message = stripAnsi(error.message);
-				const trace = stripAnsi(error.stack ?? '').replace(message, '');
+				this.currentExecutable.status = status;
 
 				this.currentExecutable.statusDetails = {message, trace};
 			} else {
@@ -161,29 +164,7 @@ export default class AllureReporter {
 			}
 		}
 
-		// If (error.matcherResult) {
-		// 	console.log('error.matcherResult:', error.matcherResult);
-		// } else {
-		// 	console.log('error:', error);
-		// }
-
-		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
-
-		const isSnapshotFailure = error.matcherResult?.name === 'toMatchSnapshot';
-
-		let message: string;
-		let trace: string;
-
-		if (isSnapshotFailure) {
-			const [matcherHint, ...snapshotDiff] = stripAnsi(error.matcherResult.message()).split('@@');
-
-			message = matcherHint;
-			trace = snapshotDiff.join('');
-			// Console.log({message, trace});
-		} else {
-			message = stripAnsi(error.message);
-			trace = stripAnsi(error.stack ?? '').replace(message, '');
-		}
+		const {status, message, trace} = this.handleError(error);
 
 		this.endTest(status, {message, trace});
 	}
@@ -221,6 +202,42 @@ export default class AllureReporter {
 		this.currentTest.stage = Stage.FINISHED;
 		this.currentTest.endTest();
 		this.currentTest = null;
+	}
+
+	private handleError(error: Error | any) {
+		if (error.matcherResult) {
+			console.log('error.matcherResult:', error.matcherResult);
+		} else {
+			console.log('error:', error);
+		}
+
+		const status = error.matcherResult ? Status.FAILED : Status.BROKEN;
+
+		const isSnapshotFailure = error.matcherResult?.name === 'toMatchSnapshot';
+
+		let message: string;
+		let trace: string;
+
+		if (isSnapshotFailure) {
+			const [matcherHint, ...snapshotDiff] = stripAnsi(error.matcherResult.message()).split('@@');
+
+			message = matcherHint;
+			trace = snapshotDiff.join('');
+		} else {
+			message = stripAnsi(error.message);
+			trace = stripAnsi(error.stack ?? '').replace(message, '');
+		}
+
+		if (!message && status) {
+			message = status;
+			trace = '';
+		}
+
+		return {
+			status,
+			message,
+			trace
+		};
 	}
 
 	private collectTestParentNames(

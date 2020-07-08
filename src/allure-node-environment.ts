@@ -12,7 +12,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 		super(config);
 
-		const allureConfig: IAllureConfig = {resultsDir: 'allure-results', ...config.testEnvironmentOptions};
+		const allureConfig: IAllureConfig = {resultsDir: 'allure-results'};
 
 		this.docblockPragmas = context.docblockPragmas;
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
@@ -25,12 +25,12 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
 
-		this.reporter = new AllureReporter(new AllureRuntime(allureConfig));
+		this.reporter = new AllureReporter(new AllureRuntime(allureConfig), config.testEnvironmentOptions?.enironmentInfo, config.testEnvironmentOptions?.jiraUrl);
 
 		this.global.allure = this.reporter.getImplementation();
 
 		if (this.docblockPragmas?.prototype !== undefined) {
-			console.log(this.docblockPragmas);
+			console.log('this.docblockPragmas:', this.docblockPragmas);
 		}
 	}
 
