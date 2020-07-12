@@ -25,10 +25,17 @@ export default class AllureReporter {
 	private readonly suites: AllureGroup[] = [];
 	private readonly steps: AllureStep[] = [];
 	private runningTest: AllureTest | null = null;
-	private readonly jiraUrl: string;
+	private readonly jiraUrl: string | undefined;
 
-	constructor(private readonly allureRuntime: AllureRuntime, jiraUrl: string) {
+	constructor(
+		private readonly allureRuntime: AllureRuntime,
+		jiraUrl?: string,
+		environmentInfo?: Record<string, string>) {
 		this.jiraUrl = jiraUrl;
+
+		if (environmentInfo) {
+			this.allureRuntime.writeEnvironmentInfo(environmentInfo);
+		}
 
 		this.allureRuntime.writeCategoriesDefinitions([
 			{

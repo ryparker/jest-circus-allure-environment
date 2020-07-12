@@ -29,7 +29,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 		this.reporter = new AllureReporter(
 			new AllureRuntime(allureConfig),
-			config.testEnvironmentOptions.jiraUrl
+			config.testEnvironmentOptions?.jiraUrl,
+			config.testEnvironmentOptions?.environmentInfo
 		);
 
 		this.global.allure = this.reporter.getImplementation();
@@ -44,8 +45,6 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	}
 
 	async teardown() {
-		// This.global.allure = null;
-
 		return super.teardown();
 	}
 
@@ -67,47 +66,83 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				this.reporter.pendingTestCase(event.test, state, this.testPath);
 				break;
 			case 'start_describe_definition':
+				/** @privateRemarks
+				 * Only called if "describe()" blocks are present.
+				 */
+
 				break;
 			case 'finish_describe_definition':
+				/** @privateRemarks
+				 * Only called if "describe()" blocks are present.
+				 */
+
 				break;
 			case 'run_describe_start':
+				/** @privateRemarks
+				 * This is called at the start of a test file.
+				 * Even if there are no describe blocks.
+				 */
+
 				this.reporter.startSuite(event.describeBlock.name);
 				break;
 			case 'test_start':
-				this.reporter.startCase(event.test, state, this.testPath);
+				/** @privateRemarks
+				 * This is called after beforeAll and before the beforeEach hooks.
+				 * If we start the test case here, allure will include the beforeEach
+				 * hook as part of the "test body" instead of the "Set up".
+				 */
+
+				// This.reporter.startCase(event.test, state, this.testPath);
 				break;
 			case 'hook_start':
 				this.reporter.startHook(event.hook.type);
+
 				break;
 			case 'hook_success':
 				this.reporter.endHook();
+
 				break;
 			case 'hook_failure':
 				console.log('TEST_FN_FAILURE ERROR:', event.error);
 				console.log('TEST_FN_FAILURE HOOK.ASYNCERROR:', event.hook.asyncError);
 
 				this.reporter.endHook(event.error ?? event.hook.asyncError);
+
 				break;
 			case 'test_fn_start':
-				// This.reporter.startCase(event.test, state, this.testPath);
+				/** @privateRemarks
+				 * This is called after the beforeAll and after the beforeEach.
+				 * Making this the most reliable event to start the test case, so
+				 * that only the test context is captured in the allure "Test body"
+				 * execution.
+				 */
+
+				this.reporter.startCase(event.test, state, this.testPath);
+
 				break;
 			case 'test_fn_success':
 				// This.reporter.passTestCase(event.test, state, this.testPath);
+
 				break;
 			case 'test_fn_failure':
 				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
 				// console.log('TEST_FN_FAILURE TEST.ERRORS:', event.test.errors);
 				// console.log('TEST_FN_FAILURE TEST.ASYNCERROR:', event.test.asyncError);
+
 				break;
 			case 'test_done':
-				/**
-				 * This is more reliable for error collection. Some failures will only appear
-				 * in this event. E.g. Snapshot test failures. Capturing errors from both
-				 * test_done and test_fn_failure causes the test to be overriden, loosing all
-				 * test context (steps).
-				 *
-				 * A workaround might be to refactor the AllureReporter class by separating
-				 * the endTestCase() from the (status*)TestCase() methods.
+				/** @privateRemarks
+				 * This is called once the test has completed (includes hooks).
+				 * This is more reliable for error collection because some failures
+				 * like Snapshot failures will only appear in this event.
+				 */
+				/** @privateRemarks
+				 * If we capture errors from both test_done and test_fn_failure
+				 * the test case will be overriden causing allure to lose any test
+				 * context like steps that the overriden test case may have had.
+				 * A workaround might be to refactor the AllureReporter class
+				 * by decouple the endTestCase method from the passTestCase,
+				 * failTestCase, and pendingTestCase methods.
 				 */
 
 				if (event.test.errors.length > 0) {
@@ -118,17 +153,36 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 				break;
 			case 'run_describe_finish':
+				/** @privateRemarks
+				 * This is called at the end of a describe block or test file. If a
+				 * describe block is not present in the test file, this event will
+				 * still be called at the end of the test file.
+				 */
+
 				this.reporter.endSuite();
+
 				break;
 			case 'run_finish':
+
 				break;
 			case 'teardown':
+
 				break;
 			case 'error':
-				console.log('ERROR EVENT:', event.error);
+				/** @privateRemarks
+				 * Haven't found a good example of when this is emitted yet.
+				 */
+
+				console.log('ERROR EVENT:', event);
+
 				break;
 			default:
+				/** @privateRemarks
+				 * Haven't found a good example of when this is emitted yet.
+				*/
+
 				console.log('UNHANDLED EVENT:', event);
+
 				break;
 		}
 	}
