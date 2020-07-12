@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.8.0...v0.9.0) (2020-07-12)
+
+
+### Features
+
+* **environmentinfo:** added environmentInfo reporting. Improved test case reporting ([9ff3ce2](https://github.com/ryparker/jest-circus-allure-environment/commit/9ff3ce20940c89b326d75a9b0991ffb331763ba8))
+
 # [0.8.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.7.2...v0.8.0) (2020-07-08)
 
 
