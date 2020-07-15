@@ -1,7 +1,7 @@
 {
   "name": "jest-circus-allure-environment",
   "version": "0.0.2",
-  "repository": "https://ryparker@github.com/ryparker/jest-circus-allure-environment.git",
+  "repository": "https://github.com/ryparker/jest-circus-allure-environment.git",
   "author": "Ryan Parker <ryan.parker3@outlook.com>",
   "license": "MIT",
   "files": [
