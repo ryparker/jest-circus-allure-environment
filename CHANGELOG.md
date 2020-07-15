@@ -1,3 +1,15 @@
+# [0.10.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.9.0...v0.10.0) (2020-07-15)
+
+
+### Bug Fixes
+
+* **fixed .git repo link:** reconfigured .git/config to use renamed repo ([f76b77f](https://github.com/ryparker/jest-circus-allure-environment/commit/f76b77f6c0853257e39924ba45004b375f70819a))
+
+
+### Features
+
+* **allure reporter:** implemented docblock pragma parsing which will be used to add more reporting ([7997047](https://github.com/ryparker/jest-circus-allure-environment/commit/79970479b8a5fa651da24144a7c7bcc9bb05843c))
+
 # [0.9.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.8.0...v0.9.0) (2020-07-12)
 
 
