@@ -1,3 +1,10 @@
+# [0.11.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.10.0...v0.11.0) (2020-07-15)
+
+
+### Features
+
+* **tms support:** enabled a tmsUrl to be setup and linked on the report. Updated README ([a9dbb72](https://github.com/ryparker/jest-circus-allure-environment/commit/a9dbb72578e35a576ac2a39d70eb8d863bc1b47d))
+
 # [0.10.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.9.0...v0.10.0) (2020-07-15)
 
 
