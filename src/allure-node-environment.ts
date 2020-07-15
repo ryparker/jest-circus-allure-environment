@@ -27,11 +27,13 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
 
-		this.reporter = new AllureReporter(
-			new AllureRuntime(allureConfig),
-			config.testEnvironmentOptions?.jiraUrl,
-			config.testEnvironmentOptions?.environmentInfo
-		);
+		this.reporter = new AllureReporter({
+			allureRuntime: new AllureRuntime(allureConfig),
+			jiraUrl: config.testEnvironmentOptions?.jiraUrl,
+			tmsUrl: config.testEnvironmentOptions?.tmsUrl,
+			environmentInfo: config.testEnvironmentOptions?.environmentInfo,
+			categoryDefinitions: config.testEnvironmentOptions?.categories
+		});
 
 		this.global.allure = this.reporter.getImplementation();
 
@@ -84,6 +86,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 */
 
 				this.reporter.startSuite(event.describeBlock.name);
+
 				break;
 			case 'test_start':
 				/** @privateRemarks
@@ -113,8 +116,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				/** @privateRemarks
 				 * This is called after the beforeAll and after the beforeEach.
 				 * Making this the most reliable event to start the test case, so
-				 * that only the test context is captured in the allure "Test body"
-				 * execution.
+				 * that only the test context is captured in the allure
+				 * "Test body" execution.
 				 */
 
 				this.reporter.startCase(event.test, state, this.testPath);
@@ -136,13 +139,17 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * This is more reliable for error collection because some failures
 				 * like Snapshot failures will only appear in this event.
 				 */
-				/** @privateRemarks
+				/** @privateRemarks -Issue-
 				 * If we capture errors from both test_done and test_fn_failure
-				 * the test case will be overriden causing allure to lose any test
-				 * context like steps that the overriden test case may have had.
+				 * the test case will be overriden causing allure to lose any
+				 * test context like steps that the overriden test case may have
+				 * had.
 				 * A workaround might be to refactor the AllureReporter class
 				 * by decouple the endTestCase method from the passTestCase,
 				 * failTestCase, and pendingTestCase methods.
+				 */
+				/** @privateRemarks -Issue-
+				 * afterEach hooks appears in the allure "test body".
 				 */
 
 				if (event.test.errors.length > 0) {

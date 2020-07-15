@@ -1,5 +1,6 @@
 import JestAllureInterface from './jest-allure-interface';
 import type * as jest from '@jest/types';
+import {parseWithComments} from 'jest-docblock';
 import stripAnsi = require('strip-ansi');
 import _ = require('lodash');
 import prettier = require('prettier/standalone');
@@ -9,91 +10,55 @@ import {
 	AllureRuntime,
 	AllureStep,
 	AllureTest,
+	Category,
 	ContentType,
 	ExecutableItemWrapper,
 	LabelName,
+	LinkType,
 	Stage,
 	Status,
 	StatusDetails
 } from 'allure-js-commons';
 import {createHash} from 'crypto';
+import defaultCategoryDefinitions from './category-definitions';
 // Import AnsiUp from 'ansi_up';
 // const ansiUp = new AnsiUp();
 
 export default class AllureReporter {
 	public currentExecutable: ExecutableItemWrapper | null = null;
+	private runningTest: AllureTest | null = null;
+	private readonly allureRuntime: AllureRuntime;
 	private readonly suites: AllureGroup[] = [];
 	private readonly steps: AllureStep[] = [];
-	private runningTest: AllureTest | null = null;
-	private readonly jiraUrl: string | undefined;
+	private readonly jiraUrl: string;
+	private readonly tmsUrl: string;
+	private readonly categoryDefinitions: Category[] = defaultCategoryDefinitions;
 
-	constructor(
-		private readonly allureRuntime: AllureRuntime,
-		jiraUrl?: string,
-		environmentInfo?: Record<string, string>) {
-		this.jiraUrl = jiraUrl;
+	constructor(options: {
+		allureRuntime: AllureRuntime;
+		jiraUrl?: string;
+		tmsUrl?: string;
+		environmentInfo?: Record<string, string>;
+		categoryDefinitions?: Category[];
+	}) {
+		this.allureRuntime = options.allureRuntime;
 
-		if (environmentInfo) {
-			this.allureRuntime.writeEnvironmentInfo(environmentInfo);
+		this.jiraUrl = options.jiraUrl ?? 'https://github.com/ryparker/jest-circus-allure-environment/blob/master/README.md';
+
+		this.tmsUrl = options.tmsUrl ?? 'https://github.com/ryparker/jest-circus-allure-environment/blob/master/README.md';
+
+		if (options.environmentInfo) {
+			this.allureRuntime.writeEnvironmentInfo(options.environmentInfo);
 		}
 
-		this.allureRuntime.writeCategoriesDefinitions([
-			{
-				name: 'Response status failures',
-				description: 'Unexpected API response status code.',
-				messageRegex: '.*toHaveStatusCode.*',
-				matchedStatuses: [
-					Status.FAILED
-				]
-			},
-			{
-				name: 'Response time failures',
-				description: 'API responses that took longer than expected.',
-				messageRegex: '.*toHaveResponseTimeBelow.*',
-				matchedStatuses: [
-					Status.FAILED
-				]
-			},
-			{
-				name: 'JSON schema failures',
-				description: 'An object did not validate against an expected JSON schema.',
-				messageRegex: '.*toMatchSchema.*',
-				matchedStatuses: [
-					Status.FAILED
-				]
-			},
-			{
-				name: 'Snapshot failures',
-				description: 'Snapshot does not match the expected snapshot.',
-				messageRegex: '.*toMatchSnapshot.*',
-				matchedStatuses: [
-					Status.FAILED
-				]
-			},
-			{
-				name: 'Updated JSON schemas',
-				description: 'Tests that have updated a JSON schema.',
-				messageRegex: '.*updated.*schema.*updated.*',
-				matchedStatuses: [
-					Status.PASSED
-				]
-			},
-			{
-				name: 'Updated snapshots',
-				description: 'Tests that have updated a snapshot.',
-				messageRegex: '.*updated.*snapshots.*updated.*',
-				matchedStatuses: [
-					Status.PASSED
-				]
-			},
-			{
-				name: 'Skipped tests',
-				description: 'Tests that were skipped in this run.',
-				matchedStatuses: [
-					Status.SKIPPED
-				]
-			}
-		]);
+		if (options.categoryDefinitions) {
+			this.categoryDefinitions = [
+				...this.categoryDefinitions,
+				...options.categoryDefinitions
+			];
+		}
+
+		this.allureRuntime.writeCategoriesDefinitions(this.categoryDefinitions);
 	}
 
 	public getImplementation(): JestAllureInterface {
@@ -141,9 +106,9 @@ export default class AllureReporter {
 	public startHook(type: jest.Circus.HookType): void {
 		const suite: AllureGroup | null = this.currentSuite;
 
-		if (suite && type && type.includes('before')) {
+		if (suite && type.includes('before')) {
 			this.currentExecutable = suite.addBefore();
-		} else if (suite && type && type.includes('after')) {
+		} else if (suite && type.includes('after')) {
 			this.currentExecutable = suite.addAfter();
 		}
 	}
@@ -153,7 +118,6 @@ export default class AllureReporter {
 			this.currentExecutable.stage = Stage.FINISHED;
 
 			if (error) {
-				// Console.log('endHook -> handleError');
 				const {status, message, trace} = this.handleError(error);
 
 				this.currentExecutable.status = status;
@@ -177,30 +141,22 @@ export default class AllureReporter {
 			.digest('hex');
 		this.currentTest.stage = Stage.RUNNING;
 
-		const testFunc = test.fn ? prettier.format(test.fn.toString(), {parser: 'typescript', plugins: [parser]}) : 'Error parsing function';
+		if (test.fn) {
+			const serializedTestCode = test.fn.toString();
+			const {code, comments, pragmas} = this.extractCodeDetails(serializedTestCode);
 
-		this.currentTest.description = `### Test\n\`\`\`typescript\n${testFunc}\n\`\`\`\n`;
+			this.setAllureReportPragmas(pragmas);
+
+			this.currentTest.description = `${comments}\n### Test\n\`\`\`typescript\n${code}\n\`\`\`\n`;
+		} else {
+			this.currentTest.description = '### Test\nCode is not available.\n';
+		}
 
 		if (state.parentProcess?.env?.JEST_WORKER_ID) {
 			this.currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
 		}
 
-		const pathsArray = testPath.split('/');
-
-		const [parentSuite, suite, ...subSuites] = pathsArray;
-
-		if (parentSuite) {
-			this.currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
-			this.currentTest.addLabel(LabelName.PACKAGE, parentSuite);
-		}
-
-		if (suite) {
-			this.currentTest.addLabel(LabelName.SUITE, suite);
-		}
-
-		if (subSuites.length > 0) {
-			this.currentTest.addLabel(LabelName.SUB_SUITE, subSuites.join(' > '));
-		}
+		this.addSuiteLabelsToTestCase(testPath);
 	}
 
 	public passTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
@@ -318,6 +274,88 @@ export default class AllureReporter {
 		};
 	}
 
+	private extractCodeDetails(serializedTestCode: string) {
+		if (this.currentTest === null) {
+			throw new Error('No active test');
+		}
+
+		const docblock = this.extractDocBlock(serializedTestCode);
+		const {pragmas, comments} = parseWithComments(docblock);
+
+		let code = serializedTestCode.replace(docblock, '');
+		// Add newline before the first expect()
+		code = code.split(/(expect[\S\s.]*)/g).join('\n');
+		code = prettier.format(code, {parser: 'typescript', plugins: [parser]});
+
+		return {code, comments, pragmas};
+	}
+
+	private extractDocBlock(contents: string): string {
+		const docblockRe = /^\s*(\/\*\*?(.|\r?\n)*?\*\/)/gm;
+
+		const match = contents.match(docblockRe);
+		return match ? match[0].trimStart() : '';
+	}
+
+	private setAllureReportPragmas(pragmas: Record<string, any>) {
+		if (!this.currentTest) {
+			throw new Error('No test running.');
+		}
+
+		const test = this.currentTest;
+
+		for (const [pragma, value] of Object.entries(pragmas)) {
+			switch (pragma) {
+				case 'issue':
+					test.addLink(`${this.jiraUrl}${(value as string)}`, (value as string), LinkType.ISSUE);
+
+					break;
+				case 'tms':
+					test.addLink(`${this.tmsUrl}${(value as string)}`, (value as string), LinkType.TMS);
+
+					break;
+				case 'tag':
+				case 'tags':
+					// TODO: Make the comma space optional.
+					if ((value as string).includes(', ')) {
+						(value as string).split(', ').map((t: string) => test.addLabel(LabelName.TAG, t));
+					} else {
+						test.addLabel(LabelName.TAG, (value as string));
+					}
+
+					break;
+				default:
+					test.addLabel(pragma, (value as string));
+
+					break;
+			}
+		}
+	}
+
+	private addSuiteLabelsToTestCase(testPath: string) {
+		if (!this.currentTest) {
+			throw new Error('No active test case');
+		}
+
+		const pathsArray = testPath.split('/');
+
+		const [parentSuite, suite, ...subSuites] = pathsArray;
+
+		if (parentSuite) {
+			this.currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
+			this.currentTest.addLabel(LabelName.PACKAGE, parentSuite);
+		}
+
+		if (suite) {
+			this.currentTest.addLabel(LabelName.SUITE, suite);
+		}
+
+		if (subSuites.length > 0) {
+			this.currentTest.addLabel(LabelName.SUB_SUITE, subSuites.join(' > '));
+		}
+	}
+
+	// TODO: Use if describe blocks are present.
 	private collectTestParentNames(
 		parent: jest.Circus.TestEntry | jest.Circus.DescribeBlock | undefined
 	) {

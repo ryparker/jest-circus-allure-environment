@@ -10,6 +10,7 @@
     "importsNotUsedAsValues": "error",
     "esModuleInterop": false,
     "noImplicitReturns": true,
+    "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "jest", "allure-js-commons", "lodash"],
