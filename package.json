@@ -68,7 +68,7 @@
     "eslint-plugin-jest": "^23.18.0",
     "jest": "^26.1.0",
     "semantic-release": "^17.1.1",
-    "typescript": "^3.9.6",
+    "typescript": "^3.9.7",
     "xo": "^0.32.1"
   },
   "engines": {
