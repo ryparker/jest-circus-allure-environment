@@ -21,7 +21,7 @@ jobs:
       # - name: Build & Test
       #   run: yarn test
 
-  publish-github-package-repo:
+  publish-npm-package:
     needs: [pre-release-checks]
     runs-on: ubuntu-latest
     env:
@@ -29,11 +29,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Node 12.x with registry access
+      - name: Setup Node 12.x
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: https://npm.pkg.github.com/
       - run: yarn install
       - name: Build
         run: yarn build
@@ -42,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-      - name: Publish to Github Package Repo
+      - name: Publish to NPM Package Repo
         env:
           GIT_TOKEN: ${{secrets.GITHUB_TOKEN}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
