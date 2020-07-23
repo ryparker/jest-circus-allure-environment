@@ -283,6 +283,7 @@ export default class AllureReporter {
 		const {pragmas, comments} = parseWithComments(docblock);
 
 		let code = serializedTestCode.replace(docblock, '');
+
 		// Add newline before the first expect()
 		code = code.split(/(expect[\S\s.]*)/g).join('\n');
 		code = prettier.format(code, {parser: 'typescript', plugins: [parser]});
@@ -298,41 +299,45 @@ export default class AllureReporter {
 	}
 
 	private setAllureReportPragmas(pragmas: Record<string, string|string[]>) {
+		for (let [pragma, value] of Object.entries(pragmas)) {
+			if (value instanceof String && value.includes(',')) {
+				value = value.split(',');
+			}
+
+			if (Array.isArray(value)) {
+				value.map(v => this.setAllureLabelsAndLinks(pragma, v));
+			} else {
+				this.setAllureLabelsAndLinks(pragma, value);
+			}
+		}
+	}
+
+	private setAllureLabelsAndLinks(labelName: string, value: string) {
 		if (!this.currentTest) {
 			throw new Error('No test running.');
 		}
 
 		const test = this.currentTest;
 
-		for (let [pragma, value] of Object.entries(pragmas)) {
-			if (Array.isArray(value)) {
-				console.debug({value});
-				value = value.join();
-			}
+		switch (labelName) {
+			case 'issue':
+				test.addLink(`${this.jiraUrl}${value}`, value, LinkType.ISSUE);
+				break;
+			case 'tms':
+				test.addLink(`${this.tmsUrl}${value}`, value, LinkType.TMS);
+				break;
+			case 'tag':
+			case 'tags':
+				test.addLabel(LabelName.TAG, value);
+				break;
+			case 'milestone':
+				test.addLabel(labelName, value);
+				test.addLabel('epic', value);
+				break;
+			default:
+				test.addLabel(labelName, value);
 
-			switch (pragma) {
-				case 'issue':
-					test.addLink(`${this.jiraUrl}${value}`, value, LinkType.ISSUE);
-
-					break;
-				case 'tms':
-					test.addLink(`${this.tmsUrl}${value}`, value, LinkType.TMS);
-
-					break;
-				case 'tag':
-				case 'tags':
-					if ((value).includes(',')) {
-						(value).split(',').map((t: string) => test.addLabel(LabelName.TAG, t.trim()));
-					} else {
-						test.addLabel(LabelName.TAG, value);
-					}
-
-					break;
-				default:
-					test.addLabel(pragma, value);
-
-					break;
-			}
+				break;
 		}
 	}
 
