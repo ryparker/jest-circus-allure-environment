@@ -1,3 +1,10 @@
+## [0.11.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.1...v0.11.2) (2020-07-23)
+
+
+### Bug Fixes
+
+* **improved handling of comma separated pragmas:** splitting comma sparated values ([4bba0a9](https://github.com/ryparker/jest-circus-allure-environment/commit/4bba0a9135a4a2d4ad8cd13504b63c2e26d837c3))
+
 ## [0.11.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.0...v0.11.1) (2020-07-23)
 
 
