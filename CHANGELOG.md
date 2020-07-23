@@ -1,3 +1,10 @@
+## [0.11.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.0...v0.11.1) (2020-07-23)
+
+
+### Bug Fixes
+
+* **allure-reporter:** removed logs and trimming comma separated pragmas ([4f99fe5](https://github.com/ryparker/jest-circus-allure-environment/commit/4f99fe51986e1a4c7cc69565ba14b6fc8bfba214))
+
 # [0.11.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.10.0...v0.11.0) (2020-07-15)
 
 
