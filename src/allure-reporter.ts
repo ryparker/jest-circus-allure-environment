@@ -297,35 +297,39 @@ export default class AllureReporter {
 		return match ? match[0].trimStart() : '';
 	}
 
-	private setAllureReportPragmas(pragmas: Record<string, any>) {
+	private setAllureReportPragmas(pragmas: Record<string, string|string[]>) {
 		if (!this.currentTest) {
 			throw new Error('No test running.');
 		}
 
 		const test = this.currentTest;
 
-		for (const [pragma, value] of Object.entries(pragmas)) {
+		for (let [pragma, value] of Object.entries(pragmas)) {
+			if (Array.isArray(value)) {
+				console.debug({value});
+				value = value.join();
+			}
+
 			switch (pragma) {
 				case 'issue':
-					test.addLink(`${this.jiraUrl}${(value as string)}`, (value as string), LinkType.ISSUE);
+					test.addLink(`${this.jiraUrl}${value}`, value, LinkType.ISSUE);
 
 					break;
 				case 'tms':
-					test.addLink(`${this.tmsUrl}${(value as string)}`, (value as string), LinkType.TMS);
+					test.addLink(`${this.tmsUrl}${value}`, value, LinkType.TMS);
 
 					break;
 				case 'tag':
 				case 'tags':
-					// TODO: Make the comma space optional.
-					if ((value as string).includes(', ')) {
-						(value as string).split(', ').map((t: string) => test.addLabel(LabelName.TAG, t));
+					if ((value).includes(',')) {
+						(value).split(',').map((t: string) => test.addLabel(LabelName.TAG, t.trim()));
 					} else {
-						test.addLabel(LabelName.TAG, (value as string));
+						test.addLabel(LabelName.TAG, value);
 					}
 
 					break;
 				default:
-					test.addLabel(pragma, (value as string));
+					test.addLabel(pragma, value);
 
 					break;
 			}

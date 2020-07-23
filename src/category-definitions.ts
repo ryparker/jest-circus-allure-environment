@@ -42,7 +42,7 @@ const categories = [
 		]
 	},
 	{
-		name: 'Test timed out',
+		name: 'Timed out',
 		description: 'The test exceeded the test threshold.',
 		traceRegex: '.*Exceeded timeout.*',
 		matchedStatuses: [

@@ -1,7 +1,6 @@
 import type {AllureStep, StepInterface, Stage, ContentType} from 'allure-js-commons';
 import {Status} from 'allure-js-commons';
 import type AllureReporter from './allure-reporter';
-// Import {JestAllureInterface} from './allure-interface';
 
 export default class StepWrapper {
 	constructor(private readonly reporter: AllureReporter, private readonly step: AllureStep) {}

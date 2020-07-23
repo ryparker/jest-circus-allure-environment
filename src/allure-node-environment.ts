@@ -36,10 +36,6 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 		});
 
 		this.global.allure = this.reporter.getImplementation();
-
-		if (this.docblockPragmas?.prototype !== undefined) {
-			console.log('this.docblockPragmas:', this.docblockPragmas);
-		}
 	}
 
 	async setup() {
@@ -170,10 +166,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 				break;
 			case 'run_finish':
-
 				break;
 			case 'teardown':
-
 				break;
 			case 'error':
 				/** @privateRemarks
