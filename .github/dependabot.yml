@@ -4,6 +4,9 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    package-manager: "npm_and_yarn"
     directory: "/"
     schedule:
       interval: "daily"
+    automerge-rule-development-deps: "semver:minor"
+    automerge-rule-runtime-deps: "semver:minor"
