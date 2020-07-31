@@ -52,7 +52,7 @@
     ]
   },
   "dependencies": {
-    "@jest/environment": "^26.1.0",
+    "@jest/environment": "^26.2.0",
     "@jest/reporters": "^26.1.0",
     "@jest/types": "^26.2.0",
     "allure-js-commons": "^2.0.0-beta.7",
