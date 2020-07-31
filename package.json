@@ -77,7 +77,7 @@
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
     "eslint-config-xo-typescript": "^0.31.0",
-    "eslint-plugin-jest": "^23.19.0",
+    "eslint-plugin-jest": "^23.20.0",
     "husky": "^4.2.5",
     "jest": "^26.1.0",
     "lint-staged": "^10.2.11",
