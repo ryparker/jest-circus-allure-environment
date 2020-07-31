@@ -63,7 +63,7 @@
     "jest-environment-node": "^26.2.0",
     "lodash": "^4.17.19",
     "prettier": "^2.0.5",
-    "pretty-format": "^26.1.0",
+    "pretty-format": "^26.2.0",
     "strip-ansi": "^6.0.0"
   },
   "devDependencies": {
