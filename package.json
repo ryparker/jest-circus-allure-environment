@@ -58,7 +58,7 @@
     "allure-js-commons": "^2.0.0-beta.8",
     "ansi_up": "^4.0.4",
     "crypto": "^1.0.1",
-    "jest-circus": "^26.4.1",
+    "jest-circus": "^26.4.2",
     "jest-docblock": "^26.0.0",
     "jest-environment-node": "^26.3.0",
     "lodash": "^4.17.20",
