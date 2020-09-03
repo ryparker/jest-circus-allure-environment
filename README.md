@@ -126,17 +126,16 @@ Options that can be passed into the `environmentOptions` property of your `jest.
 
 You may set code comments inside your tests called DocBlocks, that can be parsed for specific allure report pragmas. These are the supported DocBlock pragmas you may add to a test.
 
-
 ### 🔍 Descriptions
 
 Add descriptions that document the tested functionality.
 
 ```TS
 test('does something important, when triggered by user', () => {
-	/** This uses a 3rd party API that typically undergoes maintenance on Tuesdays.
-	 */
+  /** This uses a 3rd party API that typically undergoes maintenance on Tuesdays.
+   */
 
-	...
+  ...
 })
 ```
 
@@ -144,16 +143,16 @@ test('does something important, when triggered by user', () => {
 
 Tag a test with a custom label.
 
-_Set multiple tags using a `, ` deliminator._
+_Set multiple tags using a `,` deliminator._
 
 ```TS
 test('does something important, when triggered by user', () => {
-	/**
-	 * @tag beta
-	 * @tag feature-flagged, api-v3
-	 */
+  /**
+   * @tag beta
+   * @tag feature-flagged, api-v3
+   */
 
-	...
+  ...
 })
 ```
 
@@ -163,11 +162,11 @@ Set an owner for a test.
 
 ```TS
 test('does something important, when triggered by user', () => {
-	/**
-	 * @owner ios-team
-	 */
+  /**
+   * @owner ios-team
+   */
 
-	...
+  ..
 })
 ```
 
@@ -187,11 +186,11 @@ Example of setting a test as "critical" severity
 
 ```TS
 test('does something important, when triggered by user', () => {
-	/**
-	 * @severity critical
-	 */
+  /**
+   * @severity critical
+   */
 
-	...
+  ...
 })
 ```
 
@@ -205,18 +204,17 @@ Mark tests with a behavior label to organize tests in a feature based hierarchy.
 | feature | Tests that if fail, will effect the expected functionality of a feature. |
 | story   | Tests that if fail, will effect the expected functionality of story.     |
 
-
-Example
+Example:
 
 ```TS
 test('validation message appears, when email field is skipped', () => {
-	/**
-	 * @epic Automate user sign up
-	 * @feature Registration page
-	 * @story Validate required registration fields before creating new user
-	 */
+  /**
+   * @epic Automate user sign up
+   * @feature Registration page
+   * @story Validate required registration fields before creating new user
+   */
 
-	...
+  ...
 })
 ```
 
@@ -229,22 +227,20 @@ Add Jira and TMS links to a test.
 | issue | Adds a link to the test report that will open an existing issue in Jira.                            |
 | tms   | Adds a link to the test report that will open an existing test case in your test management system. |
 
-
-Example
+Example:
 
 ```TS
 test('validation message appears, when email field is skipped', () => {
-	/**
-	 * @issue DEBT-60
-	 * @tms CORE-122
-	 */
+  /**
+   * @issue DEBT-60
+   * @tms CORE-122
+   */
 
-	...
+  ...
 })
 ```
 
 ## 👩‍🎓 Advanced
-
 
 ### 🎛 Global Allure API
 
@@ -252,14 +248,14 @@ An instance of the allure runtime will be available on the Node global variable.
 
 ```TS
 /**
- * Returns the Allure test instance for the currently running test when called inside of a test.
+ * Returns the Allure test instance for the currently running test.
  */
 allure.currentTest(): AllureTest;
 
 /**
- * Starts and returns a new step instance on the current executable.
+ * Adds a description to the report of the current test. Supports markdown.
  */
-allure.description(description: string): void;
+allure.description(markdown: string): void;
 
 /**
  * Starts and returns a new step instance on the current executable.
@@ -267,12 +263,12 @@ allure.description(description: string): void;
 allure.startStep(name: string): StepWrapper;
 
 /**
- * Starts a new Allure step sets it's status and attachments then ends the step all in one method.
+ * Starts a new Allure step, sets the status, and adds any provided attachments (optional), then ends the step.
  */
 allure.logStep(
-	name: string,
-	status: Status,
-	attachments?: Array<{ name: string; content: string; type: ContentType }>
+  name: string,
+  status: Status,
+  attachments?: Array<{ name: string; content: string; type: ContentType }>
 ): void;
 
 /**
@@ -284,9 +280,9 @@ allure.parameter(name: string, value: string): void;
  * Attach a file to the report of the current executable.
  */
 allure.attachment(
-	name: string,
-	content: Buffer | string,
-	type: ContentType
+  name: string,
+  content: Buffer | string,
+  type: ContentType
 );
 
 /**

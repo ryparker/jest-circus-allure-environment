@@ -5,12 +5,12 @@ import {
 	AllureTest,
 	ContentType,
 	ExecutableItemWrapper,
+	LabelName,
+	LinkType,
+	Severity,
 	Status,
 	StepInterface,
-	isPromise,
-	LabelName,
-	Severity,
-	LinkType
+	isPromise
 } from 'allure-js-commons';
 
 import type AllureReporter from './allure-reporter';
@@ -33,7 +33,8 @@ export default class JestAllureInterface extends Allure {
 		const executable: AllureStep | AllureTest | ExecutableItemWrapper | null =
       this.reporter.currentStep ??
       this.reporter.currentTest ??
-      this.reporter.currentExecutable;
+			this.reporter.currentExecutable;
+
 		if (!executable) {
 			throw new Error('No executable!');
 		}
@@ -103,6 +104,7 @@ export default class JestAllureInterface extends Allure {
 
 		if (isPromise(result)) {
 			const promise = result as Promise<any>;
+
 			return promise
 				.then(a => {
 					wrappedStep.endStep();
@@ -135,11 +137,23 @@ export default class JestAllureInterface extends Allure {
 	}
 
 	public description(markdown: string) {
-		this.description(markdown);
+		const {currentTest} = this.reporter;
+
+		if (!currentTest) {
+			throw new Error('Expected a test to be executing before adding a description.');
+		}
+
+		currentTest.description = markdown;
 	}
 
 	public descriptionHtml(html: string) {
-		this.descriptionHtml(html);
+		const {currentTest} = this.reporter;
+
+		if (!currentTest) {
+			throw new Error('Expected a test to be executing before adding an HTML description.');
+		}
+
+		currentTest.descriptionHtml = html;
 	}
 
 	public attachment(
