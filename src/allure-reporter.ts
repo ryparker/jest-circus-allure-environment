@@ -1,10 +1,5 @@
-import JestAllureInterface from './jest-allure-interface';
 import type * as jest from '@jest/types';
-import {parseWithComments} from 'jest-docblock';
-import stripAnsi = require('strip-ansi');
-import _ = require('lodash');
-import prettier = require('prettier/standalone');
-import parser = require('prettier/parser-typescript');
+
 import {
 	AllureGroup,
 	AllureRuntime,
@@ -19,10 +14,15 @@ import {
 	Status,
 	StatusDetails
 } from 'allure-js-commons';
+
+import JestAllureInterface from './jest-allure-interface';
 import {createHash} from 'crypto';
 import defaultCategoryDefinitions from './category-definitions';
-// Import AnsiUp from 'ansi_up';
-// const ansiUp = new AnsiUp();
+import {parseWithComments} from 'jest-docblock';
+import stripAnsi = require('strip-ansi');
+import _ = require('lodash');
+import prettier = require('prettier/standalone');
+import parser = require('prettier/parser-typescript');
 
 export default class AllureReporter {
 	public currentExecutable: ExecutableItemWrapper | null = null;

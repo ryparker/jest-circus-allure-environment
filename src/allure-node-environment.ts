@@ -1,8 +1,10 @@
-import type {Config, Circus} from '@jest/types';
-import NodeEnvironment = require('jest-environment-node');
-import type {EnvironmentContext} from '@jest/environment';
-import AllureReporter from './allure-reporter';
 import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
+import type {Circus, Config} from '@jest/types';
+
+import AllureReporter from './allure-reporter';
+import type {EnvironmentContext} from '@jest/environment';
+
+import NodeEnvironment = require('jest-environment-node');
 
 export default class AllureNodeEnvironment extends NodeEnvironment {
 	private readonly reporter: AllureReporter;
@@ -16,7 +18,6 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			resultsDir: config.testEnvironmentOptions.resultsDir ?? 'allure-results'
 		};
 
-		this.docblockPragmas = context.docblockPragmas;
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
 
 		if (this.testPath.includes('tests/')) {
@@ -26,6 +27,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 		if (this.testPath.includes('__tests__/')) {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
+
+		this.docblockPragmas = context.docblockPragmas;
 
 		this.reporter = new AllureReporter({
 			allureRuntime: new AllureRuntime(allureConfig),
