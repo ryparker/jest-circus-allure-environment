@@ -1,3 +1,10 @@
+## [0.11.3](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.2...v0.11.3) (2020-09-03)
+
+
+### Bug Fixes
+
+* **allure.description:** allure.description should now fetch the currently active test ([f645bae](https://github.com/ryparker/jest-circus-allure-environment/commit/f645bae9dc0e48a23052ed51be873c52ea53d2ad))
+
 ## [0.11.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.1...v0.11.2) (2020-07-23)
 
 
