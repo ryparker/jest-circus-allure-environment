@@ -1,3 +1,10 @@
+## [0.11.4](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.3...v0.11.4) (2020-09-11)
+
+
+### Bug Fixes
+
+* **fixed description() and added tests:** the global allure API for .description() fix and tests ([a1dcd90](https://github.com/ryparker/jest-circus-allure-environment/commit/a1dcd90f75e53f075130eb8f640a36df6b987b88))
+
 ## [0.11.3](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.2...v0.11.3) (2020-09-03)
 
 
