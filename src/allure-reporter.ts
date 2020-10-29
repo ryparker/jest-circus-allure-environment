@@ -19,6 +19,7 @@ import JestAllureInterface from './jest-allure-interface';
 import {createHash} from 'crypto';
 import defaultCategoryDefinitions from './category-definitions';
 import {parseWithComments} from 'jest-docblock';
+
 import stripAnsi = require('strip-ansi');
 import _ = require('lodash');
 import prettier = require('prettier/standalone');
@@ -348,19 +349,20 @@ export default class AllureReporter {
 
 		const pathsArray = testPath.split('/');
 
-		const [parentSuite, suite, ...subSuites] = pathsArray;
+		const [parentSuite, ...suites] = pathsArray;
+		const subSuite = suites.pop();
 
 		if (parentSuite) {
 			this.currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
 			this.currentTest.addLabel(LabelName.PACKAGE, parentSuite);
 		}
 
-		if (suite) {
-			this.currentTest.addLabel(LabelName.SUITE, suite);
+		if (suites.length > 0) {
+			this.currentTest.addLabel(LabelName.SUITE, suites.join(' > '));
 		}
 
-		if (subSuites.length > 0) {
-			this.currentTest.addLabel(LabelName.SUB_SUITE, subSuites.join(' > '));
+		if (subSuite) {
+			this.currentTest.addLabel(LabelName.SUB_SUITE, subSuite);
 		}
 	}
 

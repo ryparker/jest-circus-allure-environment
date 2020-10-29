@@ -15,7 +15,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 		super(config);
 
 		const allureConfig: IAllureConfig = {
-			resultsDir: config.testEnvironmentOptions.resultsDir ?? 'allure-results'
+			resultsDir: config.testEnvironmentOptions.resultsDir as string ?? 'allure-results'
 		};
 
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
@@ -32,10 +32,10 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 		this.reporter = new AllureReporter({
 			allureRuntime: new AllureRuntime(allureConfig),
-			jiraUrl: config.testEnvironmentOptions?.jiraUrl,
-			tmsUrl: config.testEnvironmentOptions?.tmsUrl,
-			environmentInfo: config.testEnvironmentOptions?.environmentInfo,
-			categoryDefinitions: config.testEnvironmentOptions?.categories
+			jiraUrl: config.testEnvironmentOptions?.jiraUrl as string,
+			tmsUrl: config.testEnvironmentOptions?.tmsUrl as string,
+			environmentInfo: config.testEnvironmentOptions?.environmentInfo as Record<string, any>,
+			categoryDefinitions: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
 		});
 
 		this.global.allure = this.reporter.getImplementation();
@@ -177,7 +177,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * Haven't found a good example of when this is emitted yet.
 				 */
 
-				console.log('ERROR EVENT:', event);
+				// console.log('ERROR EVENT:', event);
 
 				break;
 			default:
@@ -185,7 +185,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * Haven't found a good example of when this is emitted yet.
 				*/
 
-				console.log('UNHANDLED EVENT:', event);
+				// console.log('UNHANDLED EVENT:', event);
 
 				break;
 		}
