@@ -97,7 +97,7 @@ export default class JestAllureInterface extends Allure {
 		let result;
 		try {
 			result = wrappedStep.run(body);
-		} catch (error) {
+		} catch (error: unknown) {
 			wrappedStep.endStep();
 			throw error;
 		}

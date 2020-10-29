@@ -105,8 +105,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 				break;
 			case 'hook_failure':
-				console.log('TEST_FN_FAILURE ERROR:', event.error);
-				console.log('TEST_FN_FAILURE HOOK.ASYNCERROR:', event.hook.asyncError);
+				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
+				// console.log('TEST_FN_FAILURE HOOK.ASYNCERROR:', event.hook.asyncError);
 
 				this.reporter.endHook(event.error ?? event.hook.asyncError);
 
