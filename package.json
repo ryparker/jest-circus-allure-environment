@@ -60,7 +60,7 @@
     "crypto": "^1.0.1",
     "jest-circus": "^26.6.1",
     "jest-docblock": "^26.0.0",
-    "jest-environment-node": "^26.6.1",
+    "jest-environment-node": "^26.6.2",
     "lodash": "^4.17.20",
     "prettier": "^2.1.2",
     "pretty-format": "^26.6.1",
