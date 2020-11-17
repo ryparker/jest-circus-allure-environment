@@ -1,3 +1,15 @@
+# [0.12.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.4...v0.12.0) (2020-10-29)
+
+
+### Bug Fixes
+
+* **logs:** removed debug logging of errors ([dcbe549](https://github.com/ryparker/jest-circus-allure-environment/commit/dcbe549ce4dac7dca4b22716540902f5b1f2d3c1))
+
+
+### Features
+
+* **allure suites page:** test file paths will now show just the file name in the 3rd tier ([3fc991f](https://github.com/ryparker/jest-circus-allure-environment/commit/3fc991f123c5bb6678c812dba3a3adc6ee285d54))
+
 ## [0.11.4](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.3...v0.11.4) (2020-09-11)
 
 
