@@ -144,7 +144,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * test context like steps that the overriden test case may have
 				 * had.
 				 * A workaround might be to refactor the AllureReporter class
-				 * by decouple the endTestCase method from the passTestCase,
+				 * by decoupling the endTestCase method from the passTestCase,
 				 * failTestCase, and pendingTestCase methods.
 				 */
 				/** @privateRemarks -Issue-
