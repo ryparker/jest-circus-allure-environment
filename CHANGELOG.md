@@ -1,3 +1,10 @@
+# [0.13.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.12.0...v0.13.0) (2020-11-17)
+
+
+### Features
+
+* **package.json:** bumped all deps to latest versions ([f34ea2a](https://github.com/ryparker/jest-circus-allure-environment/commit/f34ea2abb4a838e610dc96ca30fc3e9dca73dab8))
+
 # [0.12.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.11.4...v0.12.0) (2020-10-29)
 
 
