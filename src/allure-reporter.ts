@@ -1,4 +1,5 @@
 import type * as jest from '@jest/types';
+import * as os from 'os';
 
 import {
 	AllureGroup,
@@ -26,7 +27,7 @@ import prettier = require('prettier/standalone');
 import parser = require('prettier/parser-typescript');
 
 export default class AllureReporter {
-	public currentExecutable: ExecutableItemWrapper | null = null;
+	currentExecutable: ExecutableItemWrapper | null = null;
 	private runningTest: AllureTest | null = null;
 	private readonly allureRuntime: AllureRuntime;
 	private readonly suites: AllureGroup[] = [];
@@ -62,7 +63,7 @@ export default class AllureReporter {
 		this.allureRuntime.writeCategoriesDefinitions(this.categoryDefinitions);
 	}
 
-	public getImplementation(): JestAllureInterface {
+	getImplementation(): JestAllureInterface {
 		return new JestAllureInterface(this, this.allureRuntime, this.jiraUrl);
 	}
 
@@ -82,18 +83,18 @@ export default class AllureReporter {
 		this.runningTest = test;
 	}
 
-	public environmentInfo(info?: Record<string, string>) {
+	environmentInfo(info?: Record<string, string>) {
 		return this.allureRuntime.writeEnvironmentInfo(info);
 	}
 
-	public startSuite(suiteName: string): void {
+	startSuite(suiteName: string): void {
 		const scope: AllureGroup | AllureRuntime =
       this.currentSuite ?? this.allureRuntime;
 		const suite: AllureGroup = scope.startGroup(suiteName || 'Global');
 		this.pushSuite(suite);
 	}
 
-	public endSuite(): void {
+	endSuite(): void {
 		if (this.currentSuite !== null) {
 			if (this.currentStep !== null) {
 				this.currentStep.endStep();
@@ -104,17 +105,19 @@ export default class AllureReporter {
 		}
 	}
 
-	public startHook(type: jest.Circus.HookType): void {
+	startHook(type: jest.Circus.HookType): void {
 		const suite: AllureGroup | null = this.currentSuite;
 
 		if (suite && type.includes('before')) {
 			this.currentExecutable = suite.addBefore();
-		} else if (suite && type.includes('after')) {
+		}
+
+		if (suite && type.includes('after')) {
 			this.currentExecutable = suite.addAfter();
 		}
 	}
 
-	public endHook(error?: Error): void {
+	endHook(error?: Error): void {
 		if (this.currentExecutable) {
 			this.currentExecutable.stage = Stage.FINISHED;
 
@@ -122,15 +125,16 @@ export default class AllureReporter {
 				const {status, message, trace} = this.handleError(error);
 
 				this.currentExecutable.status = status;
-
 				this.currentExecutable.statusDetails = {message, trace};
-			} else {
+			}
+
+			if (!error) {
 				this.currentExecutable.status = Status.PASSED;
 			}
 		}
 	}
 
-	public startCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
+	startCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
 		if (this.currentSuite === null) {
 			throw new Error('No active suite');
 		}
@@ -149,7 +153,9 @@ export default class AllureReporter {
 			this.setAllureReportPragmas(pragmas);
 
 			this.currentTest.description = `${comments}\n### Test\n\`\`\`typescript\n${code}\n\`\`\`\n`;
-		} else {
+		}
+
+		if (!test.fn) {
 			this.currentTest.description = '### Test\nCode is not available.\n';
 		}
 
@@ -160,7 +166,7 @@ export default class AllureReporter {
 		this.addSuiteLabelsToTestCase(testPath);
 	}
 
-	public passTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
+	passTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
 		if (this.currentTest === null) {
 			this.startCase(test, state, testPath);
 		}
@@ -168,12 +174,12 @@ export default class AllureReporter {
 		this.endTest(Status.PASSED);
 	}
 
-	public pendingTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
+	pendingTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
 		this.startCase(test, state, testPath);
 		this.endTest(Status.SKIPPED, {message: `Test is marked: "${test.mode as string}"`});
 	}
 
-	public failTestCase(
+	failTestCase(
 		test: jest.Circus.TestEntry,
 		state: jest.Circus.State,
 		testPath: string,
@@ -181,7 +187,9 @@ export default class AllureReporter {
 	): void {
 		if (this.currentTest === null) {
 			this.startCase(test, state, testPath);
-		} else {
+		}
+
+		if (this.currentTest) {
 			const latestStatus = this.currentTest.status;
 
 			// If test already has a failed state, we should not overwrite it
@@ -195,23 +203,23 @@ export default class AllureReporter {
 		this.endTest(status, {message, trace});
 	}
 
-	public writeAttachment(content: Buffer | string, type: ContentType): string {
+	writeAttachment(content: Buffer | string, type: ContentType): string {
 		return this.allureRuntime.writeAttachment(content, type);
 	}
 
-	public pushStep(step: AllureStep): void {
+	pushStep(step: AllureStep): void {
 		this.steps.push(step);
 	}
 
-	public popStep(): void {
+	popStep(): void {
 		this.steps.pop();
 	}
 
-	public pushSuite(suite: AllureGroup): void {
+	pushSuite(suite: AllureGroup): void {
 		this.suites.push(suite);
 	}
 
-	public popSuite(): void {
+	popSuite(): void {
 		this.suites.pop();
 	}
 
@@ -307,7 +315,9 @@ export default class AllureReporter {
 
 			if (Array.isArray(value)) {
 				value.map(v => this.setAllureLabelsAndLinks(pragma, v));
-			} else {
+			}
+
+			if (!Array.isArray(value)) {
 				this.setAllureLabelsAndLinks(pragma, value);
 			}
 		}
@@ -337,7 +347,6 @@ export default class AllureReporter {
 				break;
 			default:
 				test.addLabel(labelName, value);
-
 				break;
 		}
 	}
@@ -347,7 +356,9 @@ export default class AllureReporter {
 			throw new Error('No active test case');
 		}
 
-		const pathsArray = testPath.split('/');
+		const isWindows = os.type() === 'Windows_NT';
+		const pathDelimiter = isWindows ? '\\' : '/';
+		const pathsArray = testPath.split(pathDelimiter);
 
 		const [parentSuite, ...suites] = pathsArray;
 		const subSuite = suites.pop();
