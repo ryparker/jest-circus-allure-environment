@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.3](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.2...v0.13.3) (2020-11-20)
+
+
+### Bug Fixes
+
+* **package.json:** resolved to "mem": "^4.0", ([e957e0c](https://github.com/ryparker/jest-circus-allure-environment/commit/e957e0cd6c88b870f916c0f3bd2df96e0b873082))
+
 ## [0.13.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.1...v0.13.2) (2020-11-20)
 
 
