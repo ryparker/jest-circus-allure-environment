@@ -1,3 +1,12 @@
+# Changelog
+
+## [0.13.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.1...v0.13.2) (2020-11-20)
+
+
+### Bug Fixes
+
+* **package.json:** upgraded deps and workflows ([19ab8e0](https://github.com/ryparker/jest-circus-allure-environment/commit/19ab8e05a1b5349626c8bac1c0266b125328599d))
+
 ## [0.13.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.0...v0.13.1) (2020-11-18)
 
 
