@@ -1,5 +1,6 @@
 # Jest Circus Allure Environment
 
+[![npm version](https://badge.fury.io/js/jest-circus-allure-environment.svg)](https://badge.fury.io/js/jest-circus-allure-environment)
 [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
 ![Lint-Build-Test-Publish](https://github.com/ryparker/jest-circus-allure-reporter/workflows/Lint-Build-Test-Publish/badge.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
@@ -13,20 +14,20 @@ A Jest Circus environment for Allure reporting.
 ---
 
 - [Jest Circus Allure Environment](#jest-circus-allure-environment)
-	- [❗️ Requirements](#️-requirements)
-	- [:rocket: Quick start](#-quick-start)
-	- [:camera_flash: Allure reporting in your tests](#-allure-reporting-in-your-tests)
-	- [🔧 Typescript & Intellisense setup](#-typescript--intellisense-setup)
-	- [:gear: Options](#️-options)
-	- [📈 DocBlocks](#-docblocks)
-		- [🔍 Descriptions](#-descriptions)
-		- [🏷 Tag](#-tag)
-		- [👥 Owner](#-owner)
-		- [:part_alternation_mark: Severity](#️-severity)
-		- [📇 Behaviors (epics, features, stories)](#-behaviors-epics-features-stories)
-		- [🔗 Links (Jira and TMS)](#-links-jira-and-tms)
-	- [👩‍🎓 Advanced](#-advanced)
-		- [🎛 Global Allure API](#-global-allure-api)
+  - [❗️ Requirements](#️-requirements)
+  - [:rocket: Quick start](#rocket-quick-start)
+  - [:camera_flash: Allure reporting in your tests](#camera_flash-allure-reporting-in-your-tests)
+  - [🔧 Typescript & Intellisense setup](#-typescript--intellisense-setup)
+  - [:gear: Options](#gear-options)
+  - [📈 DocBlocks](#-docblocks)
+    - [🔍 Descriptions](#-descriptions)
+    - [🏷 Tag](#-tag)
+    - [👥 Owner](#-owner)
+    - [:part_alternation_mark: Severity](#part_alternation_mark-severity)
+    - [📇 Behaviors (epics, features, stories)](#-behaviors-epics-features-stories)
+    - [🔗 Links (Jira and TMS)](#-links-jira-and-tms)
+  - [👩‍🎓 Advanced](#-advanced)
+    - [🎛 Global Allure API](#-global-allure-api)
 
 ---
 
