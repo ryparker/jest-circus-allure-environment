@@ -1,3 +1,11 @@
+## [0.13.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.0...v0.13.1) (2020-11-18)
+
+
+### Bug Fixes
+
+* **fixed file pathing on windows machines:** the report was not parsing file paths as expected ([59e9c15](https://github.com/ryparker/jest-circus-allure-environment/commit/59e9c158ec72f49ebff444440db74752b766566c))
+* **package.json:** upgraded deps ([c6c663c](https://github.com/ryparker/jest-circus-allure-environment/commit/c6c663cc1a3b5497d358dc0231f5e325ec648842))
+
 # [0.13.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.12.0...v0.13.0) (2020-11-17)
 
 
