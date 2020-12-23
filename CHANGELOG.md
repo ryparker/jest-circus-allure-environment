@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.5](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.4...v0.13.5) (2020-12-23)
+
+
+### Bug Fixes
+
+* **allure-reporter.ts:** passing test through pragma methods ([c8a35f6](https://github.com/ryparker/jest-circus-allure-environment/commit/c8a35f63359497165136dcbc5776ba22814ced1b))
+
 ## [0.13.4](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.3...v0.13.4) (2020-12-23)
 
 
