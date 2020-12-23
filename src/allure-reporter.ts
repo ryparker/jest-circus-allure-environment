@@ -170,7 +170,7 @@ export default class AllureReporter {
 			const serializedTestCode = test.fn.toString();
 			const {code, comments, pragmas} = this.extractCodeDetails(serializedTestCode);
 
-			this.setAllureReportPragmas(pragmas);
+			this.setAllureReportPragmas(currentTest, pragmas);
 
 			currentTest.description = `${comments}\n### Test\n\`\`\`typescript\n${code}\n\`\`\`\n`;
 		}
@@ -330,7 +330,7 @@ export default class AllureReporter {
 		return match ? match[0].trimStart() : '';
 	}
 
-	private setAllureReportPragmas(pragmas: Record<string, string|string[]>) {
+	private setAllureReportPragmas(currentTest: AllureTest, pragmas: Record<string, string|string[]>) {
 		for (let [pragma, value] of Object.entries(pragmas)) {
 			if (value instanceof String && value.includes(',')) {
 				value = value.split(',');
@@ -338,40 +338,34 @@ export default class AllureReporter {
 
 			if (Array.isArray(value)) {
 				value.forEach(v => {
-					this.setAllureLabelsAndLinks(pragma, v);
+					this.setAllureLabelsAndLinks(currentTest, pragma, v);
 				});
 			}
 
 			if (!Array.isArray(value)) {
-				this.setAllureLabelsAndLinks(pragma, value);
+				this.setAllureLabelsAndLinks(currentTest, pragma, value);
 			}
 		}
 	}
 
-	private setAllureLabelsAndLinks(labelName: string, value: string) {
-		if (!this.currentTest) {
-			throw new Error('setAllureLabelsAndLinks called while no test is running.');
-		}
-
-		const test = this.currentTest;
-
+	private setAllureLabelsAndLinks(currentTest: AllureTest, labelName: string, value: string) {
 		switch (labelName) {
 			case 'issue':
-				test.addLink(`${this.jiraUrl}${value}`, value, LinkType.ISSUE);
+				currentTest.addLink(`${this.jiraUrl}${value}`, value, LinkType.ISSUE);
 				break;
 			case 'tms':
-				test.addLink(`${this.tmsUrl}${value}`, value, LinkType.TMS);
+				currentTest.addLink(`${this.tmsUrl}${value}`, value, LinkType.TMS);
 				break;
 			case 'tag':
 			case 'tags':
-				test.addLabel(LabelName.TAG, value);
+				currentTest.addLabel(LabelName.TAG, value);
 				break;
 			case 'milestone':
-				test.addLabel(labelName, value);
-				test.addLabel('epic', value);
+				currentTest.addLabel(labelName, value);
+				currentTest.addLabel('epic', value);
 				break;
 			default:
-				test.addLabel(labelName, value);
+				currentTest.addLabel(labelName, value);
 				break;
 		}
 	}
