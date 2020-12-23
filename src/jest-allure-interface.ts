@@ -130,7 +130,9 @@ export default class JestAllureInterface extends Allure {
 		step.status = status;
 
 		if (attachments) {
-			attachments.map(a => this.attachment(a.name, a.content, a.type));
+			attachments.forEach(a => {
+				this.attachment(a.name, a.content, a.type);
+			});
 		}
 
 		step.endStep();

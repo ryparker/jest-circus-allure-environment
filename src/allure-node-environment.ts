@@ -5,10 +5,12 @@ import AllureReporter from './allure-reporter';
 import type {EnvironmentContext} from '@jest/environment';
 
 import NodeEnvironment = require('jest-environment-node');
+import {basename} from 'path';
 
 export default class AllureNodeEnvironment extends NodeEnvironment {
 	private readonly reporter: AllureReporter;
 	private readonly testPath: string;
+	private readonly testFileName: string;
 	private readonly docblockPragmas?: Record<string, string | string[]>;
 
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
@@ -27,6 +29,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 		if (this.testPath.includes('__tests__/')) {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
+
+		this.testFileName = basename(this.testPath);
 
 		this.docblockPragmas = context.docblockPragmas;
 
@@ -51,26 +55,29 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 	handleTestEvent(event: Circus.Event, state: Circus.State) {
 		// Console.log(`Event: ${event.name}`);
-		// console.log({event});
+		// Console.log({event});
 
 		switch (event.name) {
 			case 'setup':
+
 				break;
 			case 'add_hook':
 				break;
 			case 'add_test':
 				break;
 			case 'run_start':
-				/**
-				 * @privateRemarks
-				 * This is called at the start of a test run.
-				 */
+				this.reporter.startTestFile(this.testFileName);
+
 				break;
 			case 'test_skip':
-				this.reporter.pendingTestCase(event.test, state, this.testPath);
+				this.reporter.startTestCase(event.test, state, this.testPath);
+				this.reporter.pendingTestCase(event.test);
+
 				break;
 			case 'test_todo':
-				this.reporter.pendingTestCase(event.test, state, this.testPath);
+				this.reporter.startTestCase(event.test, state, this.testPath);
+				this.reporter.pendingTestCase(event.test);
+
 				break;
 			case 'start_describe_definition':
 				/**
@@ -104,7 +111,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * hook as part of the "test body" instead of the "Set up".
 				 */
 
-				// This.reporter.startCase(event.test, state, this.testPath);
+				// This.reporter.startTestCase(event.test, state, this.testPath);
 				break;
 			case 'hook_start':
 				this.reporter.startHook(event.hook.type);
@@ -127,18 +134,19 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * "Test body" execution.
 				 */
 
-				this.reporter.startCase(event.test, state, this.testPath);
+				this.reporter.startTestCase(event.test, state, this.testPath);
 
 				break;
 			case 'test_fn_success':
-				this.reporter.passTestCase(event.test, state, this.testPath);
+				if (event.test.errors.length > 0) {
+					this.reporter.failTestCase(event.test.errors[0]);
+				} else {
+					this.reporter.passTestCase();
+				}
 
 				break;
 			case 'test_fn_failure':
-				// Console.log('TEST_FN_FAILURE ERROR:', event.error);
-				// console.log('TEST_FN_FAILURE TEST.ERRORS:', event.test.errors);
-				// console.log('TEST_FN_FAILURE TEST.ASYNCERROR:', event.test.asyncError);
-				this.reporter.failTestCase(event.test, state, this.testPath, event.test.errors[0]);
+				this.reporter.failTestCase(event.test.errors[0]);
 
 				break;
 			case 'test_done':
@@ -182,6 +190,8 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 				break;
 			case 'run_finish':
+				this.reporter.endTestFile();
+
 				break;
 			case 'teardown':
 				break;

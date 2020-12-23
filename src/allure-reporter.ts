@@ -28,10 +28,10 @@ import parser = require('prettier/parser-typescript');
 
 export default class AllureReporter {
 	currentExecutable: ExecutableItemWrapper | null = null;
-	private runningTest: AllureTest | null = null;
 	private readonly allureRuntime: AllureRuntime;
 	private readonly suites: AllureGroup[] = [];
 	private readonly steps: AllureStep[] = [];
+	private readonly tests: AllureTest[] = [];
 	private readonly jiraUrl: string;
 	private readonly tmsUrl: string;
 	private readonly categoryDefinitions: Category[] = defaultCategoryDefinitions;
@@ -76,75 +76,95 @@ export default class AllureReporter {
 	}
 
 	get currentTest(): AllureTest | null {
-		return this.runningTest;
-	}
-
-	set currentTest(test: AllureTest | null) {
-		this.runningTest = test;
+		return this.tests.length > 0 ? this.tests[this.tests.length - 1] : null;
 	}
 
 	environmentInfo(info?: Record<string, string>) {
-		return this.allureRuntime.writeEnvironmentInfo(info);
+		this.allureRuntime.writeEnvironmentInfo(info);
 	}
 
-	startSuite(suiteName: string): void {
+	startTestFile(suiteName?: string): void {
+		this.startSuite(suiteName);
+	}
+
+	endTestFile(): void {
+		this.suites.forEach(_ => {
+			this.endSuite();
+		});
+
+		// This.endSuite();
+	}
+
+	startSuite(suiteName?: string): void {
 		const scope: AllureGroup | AllureRuntime =
       this.currentSuite ?? this.allureRuntime;
-		const suite: AllureGroup = scope.startGroup(suiteName || 'Global');
+		const suite: AllureGroup = scope.startGroup(suiteName ?? 'Global');
 		this.pushSuite(suite);
 	}
 
 	endSuite(): void {
-		if (this.currentSuite !== null) {
-			if (this.currentStep !== null) {
-				this.currentStep.endStep();
-			}
-
-			this.currentSuite.endGroup();
-			this.popSuite();
+		if (this.currentSuite === null) {
+			throw new Error('endSuite called while no suite is running');
 		}
+
+		if (this.steps.length > 0) {
+			this.steps.forEach(step => {
+				step.endStep();
+			});
+		}
+
+		if (this.tests.length > 0) {
+			this.tests.forEach(test => {
+				test.endTest();
+			});
+		}
+
+		this.currentSuite.endGroup();
+		this.popSuite();
 	}
 
 	startHook(type: jest.Circus.HookType): void {
 		const suite: AllureGroup | null = this.currentSuite;
 
-		if (suite && type.includes('before')) {
+		if (suite && type.startsWith('before')) {
 			this.currentExecutable = suite.addBefore();
 		}
 
-		if (suite && type.includes('after')) {
+		if (suite && type.startsWith('after')) {
 			this.currentExecutable = suite.addAfter();
 		}
 	}
 
 	endHook(error?: Error): void {
-		if (this.currentExecutable) {
+		if (this.currentExecutable === null) {
+			throw new Error('endHook called while no executable is running');
+		}
+
+		if (error) {
+			const {status, message, trace} = this.handleError(error);
+
+			this.currentExecutable.status = status;
+			this.currentExecutable.statusDetails = {message, trace};
 			this.currentExecutable.stage = Stage.FINISHED;
+		}
 
-			if (error) {
-				const {status, message, trace} = this.handleError(error);
-
-				this.currentExecutable.status = status;
-				this.currentExecutable.statusDetails = {message, trace};
-			}
-
-			if (!error) {
-				this.currentExecutable.status = Status.PASSED;
-			}
+		if (!error) {
+			this.currentExecutable.status = Status.PASSED;
+			this.currentExecutable.stage = Stage.FINISHED;
 		}
 	}
 
-	startCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
+	startTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
 		if (this.currentSuite === null) {
-			throw new Error('No active suite');
+			throw new Error('startTestCase called while no suite is running');
 		}
 
-		this.currentTest = this.currentSuite.startTest(test.name);
-		this.currentTest.fullName = test.name;
-		this.currentTest.historyId = createHash('md5')
+		let currentTest = this.currentSuite.startTest(test.name);
+		currentTest.fullName = test.name;
+		currentTest.historyId = createHash('md5')
 			.update(testPath + '.' + test.name)
 			.digest('hex');
-		this.currentTest.stage = Stage.RUNNING;
+		currentTest.stage = Stage.RUNNING;
 
 		if (test.fn) {
 			const serializedTestCode = test.fn.toString();
@@ -152,55 +172,69 @@ export default class AllureReporter {
 
 			this.setAllureReportPragmas(pragmas);
 
-			this.currentTest.description = `${comments}\n### Test\n\`\`\`typescript\n${code}\n\`\`\`\n`;
+			currentTest.description = `${comments}\n### Test\n\`\`\`typescript\n${code}\n\`\`\`\n`;
 		}
 
 		if (!test.fn) {
-			this.currentTest.description = '### Test\nCode is not available.\n';
+			currentTest.description = '### Test\nCode is not available.\n';
 		}
 
 		if (state.parentProcess?.env?.JEST_WORKER_ID) {
-			this.currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
+			currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
 		}
 
-		this.addSuiteLabelsToTestCase(testPath);
+		currentTest = this.addSuiteLabelsToTestCase(currentTest, testPath);
+		this.pushTest(currentTest);
 	}
 
-	passTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
+	passTestCase(): void {
 		if (this.currentTest === null) {
-			this.startCase(test, state, testPath);
+			throw new Error('passTestCase called while no test is running');
 		}
 
 		this.endTest(Status.PASSED);
 	}
 
-	pendingTestCase(test: jest.Circus.TestEntry, state: jest.Circus.State, testPath: string): void {
-		this.startCase(test, state, testPath);
+	pendingTestCase(test: jest.Circus.TestEntry): void {
+		if (this.currentTest === null) {
+			throw new Error('pendingTestCase called while no test is running');
+		}
+
 		this.endTest(Status.SKIPPED, {message: `Test is marked: "${test.mode as string}"`});
 	}
 
-	failTestCase(
-		test: jest.Circus.TestEntry,
-		state: jest.Circus.State,
-		testPath: string,
-		error: Error | any
-	): void {
+	failTestCase(error: Error | any): void {
 		if (this.currentTest === null) {
-			this.startCase(test, state, testPath);
+			throw new Error('failTestCase called while no test is running');
 		}
 
-		if (this.currentTest) {
-			const latestStatus = this.currentTest.status;
+		const latestStatus = this.currentTest.status;
 
-			// If test already has a failed state, we should not overwrite it
-			if (latestStatus === Status.FAILED || latestStatus === Status.BROKEN) {
-				return;
-			}
+		// If test already has a failed/broken state, we should not overwrite it
+		const isBrokenTest = latestStatus === Status.BROKEN && this.currentTest.stage !== Stage.RUNNING;
+		if (latestStatus === Status.FAILED || isBrokenTest) {
+			return;
 		}
 
 		const {status, message, trace} = this.handleError(error);
 
 		this.endTest(status, {message, trace});
+	}
+
+	endTest(status: Status, details?: StatusDetails) {
+		if (this.currentTest === null) {
+			throw new Error('endTest called while no test is running');
+		}
+
+		this.currentTest.status = status;
+
+		if (details) {
+			this.currentTest.statusDetails = details;
+		}
+
+		this.currentTest.stage = Stage.FINISHED;
+		this.currentTest.endTest();
+		this.popTest();
 	}
 
 	writeAttachment(content: Buffer | string, type: ContentType): string {
@@ -215,27 +249,20 @@ export default class AllureReporter {
 		this.steps.pop();
 	}
 
+	pushTest(test: AllureTest): void {
+		this.tests.push(test);
+	}
+
+	popTest(): void {
+		this.tests.pop();
+	}
+
 	pushSuite(suite: AllureGroup): void {
 		this.suites.push(suite);
 	}
 
 	popSuite(): void {
 		this.suites.pop();
-	}
-
-	private endTest(status: Status, details?: StatusDetails): void {
-		if (this.currentTest === null) {
-			throw new Error('endTest while no test is running');
-		}
-
-		if (details) {
-			this.currentTest.statusDetails = details;
-		}
-
-		this.currentTest.status = status;
-		this.currentTest.stage = Stage.FINISHED;
-		this.currentTest.endTest();
-		this.currentTest = null;
 	}
 
 	private handleError(error: Error | any) {
@@ -284,10 +311,6 @@ export default class AllureReporter {
 	}
 
 	private extractCodeDetails(serializedTestCode: string) {
-		if (this.currentTest === null) {
-			throw new Error('No active test');
-		}
-
 		const docblock = this.extractDocBlock(serializedTestCode);
 		const {pragmas, comments} = parseWithComments(docblock);
 
@@ -314,7 +337,9 @@ export default class AllureReporter {
 			}
 
 			if (Array.isArray(value)) {
-				value.map(v => this.setAllureLabelsAndLinks(pragma, v));
+				value.forEach(v => {
+					this.setAllureLabelsAndLinks(pragma, v);
+				});
 			}
 
 			if (!Array.isArray(value)) {
@@ -325,7 +350,7 @@ export default class AllureReporter {
 
 	private setAllureLabelsAndLinks(labelName: string, value: string) {
 		if (!this.currentTest) {
-			throw new Error('No test running.');
+			throw new Error('setAllureLabelsAndLinks called while no test is running.');
 		}
 
 		const test = this.currentTest;
@@ -351,11 +376,7 @@ export default class AllureReporter {
 		}
 	}
 
-	private addSuiteLabelsToTestCase(testPath: string) {
-		if (!this.currentTest) {
-			throw new Error('No active test case');
-		}
-
+	private addSuiteLabelsToTestCase(currentTest: AllureTest, testPath: string): AllureTest {
 		const isWindows = os.type() === 'Windows_NT';
 		const pathDelimiter = isWindows ? '\\' : '/';
 		const pathsArray = testPath.split(pathDelimiter);
@@ -364,17 +385,19 @@ export default class AllureReporter {
 		const subSuite = suites.pop();
 
 		if (parentSuite) {
-			this.currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
-			this.currentTest.addLabel(LabelName.PACKAGE, parentSuite);
+			currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
+			currentTest.addLabel(LabelName.PACKAGE, parentSuite);
 		}
 
 		if (suites.length > 0) {
-			this.currentTest.addLabel(LabelName.SUITE, suites.join(' > '));
+			currentTest.addLabel(LabelName.SUITE, suites.join(' > '));
 		}
 
 		if (subSuite) {
-			this.currentTest.addLabel(LabelName.SUB_SUITE, subSuite);
+			currentTest.addLabel(LabelName.SUB_SUITE, subSuite);
 		}
+
+		return currentTest;
 	}
 
 	// TODO: Use if describe blocks are present.
