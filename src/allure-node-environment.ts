@@ -22,11 +22,11 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 
 		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
 
-		if (this.testPath.includes('tests/')) {
+		if (this.testPath.includes('/tests/')) {
 			this.testPath = this.testPath.split('tests/')[1];
 		}
 
-		if (this.testPath.includes('__tests__/')) {
+		if (this.testPath.includes('/__tests__/')) {
 			this.testPath = this.testPath.split('__tests__/')[1];
 		}
 
@@ -171,11 +171,11 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				 * afterEach hooks appears in the allure "test body".
 				 */
 
-				// if (event.test.errors.length > 0) {
-				// 	this.reporter.failTestCase(event.test, state, this.testPath, event.test.errors[0]);
-				// } else {
-				// 	this.reporter.passTestCase(event.test, state, this.testPath);
-				// }
+				if (event.test.errors.length > 0) {
+					this.reporter.failTestCase(event.test.errors[0]);
+				}
+
+				this.reporter.endTest();
 
 				break;
 			case 'run_describe_finish':

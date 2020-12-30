@@ -91,8 +91,6 @@ export default class AllureReporter {
 		this.suites.forEach(_ => {
 			this.endSuite();
 		});
-
-		// This.endSuite();
 	}
 
 	startSuite(suiteName?: string): void {
@@ -192,7 +190,7 @@ export default class AllureReporter {
 			throw new Error('passTestCase called while no test is running');
 		}
 
-		this.endTest(Status.PASSED);
+		this.currentTest.status = Status.PASSED;
 	}
 
 	pendingTestCase(test: jest.Circus.TestEntry): void {
@@ -200,7 +198,8 @@ export default class AllureReporter {
 			throw new Error('pendingTestCase called while no test is running');
 		}
 
-		this.endTest(Status.SKIPPED, {message: `Test is marked: "${test.mode as string}"`});
+		this.currentTest.status = Status.SKIPPED;
+		this.currentTest.statusDetails = {message: `Test is marked: "${test.mode as string}"`};
 	}
 
 	failTestCase(error: Error | any): void {
@@ -218,18 +217,13 @@ export default class AllureReporter {
 
 		const {status, message, trace} = this.handleError(error);
 
-		this.endTest(status, {message, trace});
+		this.currentTest.status = status;
+		this.currentTest.statusDetails = {message, trace};
 	}
 
-	endTest(status: Status, details?: StatusDetails) {
+	endTest() {
 		if (this.currentTest === null) {
 			throw new Error('endTest called while no test is running');
-		}
-
-		this.currentTest.status = status;
-
-		if (details) {
-			this.currentTest.statusDetails = details;
 		}
 
 		this.currentTest.stage = Stage.FINISHED;
@@ -267,7 +261,7 @@ export default class AllureReporter {
 
 	private handleError(error: Error | any) {
 		if (Array.isArray(error)) {
-			// Test_done event (consistently?) sends an array of error arrays.
+			// Test_done event sends an array of arrays containing errors.
 			error = _.flattenDeep(error)[0];
 		}
 
