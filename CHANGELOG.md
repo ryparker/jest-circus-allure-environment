@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.6](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.5...v0.13.6) (2020-12-30)
+
+
+### Bug Fixes
+
+* **allure-node-environment.ts,allure-report.ts:** beforeAll failures should mark tests as "broken" ([66e60b4](https://github.com/ryparker/jest-circus-allure-environment/commit/66e60b43de39156fcce48ecde714ca3c88721409))
+
 ## [0.13.5](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.4...v0.13.5) (2020-12-23)
 
 
