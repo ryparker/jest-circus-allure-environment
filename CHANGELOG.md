@@ -1,5 +1,12 @@
 # Changelog
 
+# [0.14.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.6...v0.14.0) (2021-01-02)
+
+
+### Features
+
+* **allure-node-environment.ts:** added `testPath` config option ([bf787c3](https://github.com/ryparker/jest-circus-allure-environment/commit/bf787c381f6d69c28949a8814a5b7a90e5ff9b6b))
+
 ## [0.13.6](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.5...v0.13.6) (2020-12-30)
 
 
