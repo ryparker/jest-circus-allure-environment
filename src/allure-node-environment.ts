@@ -11,38 +11,53 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 	private readonly reporter: AllureReporter;
 	private readonly testPath: string;
 	private readonly testFileName: string;
-	private readonly docblockPragmas?: Record<string, string | string[]>;
 
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 		super(config);
 
+		if (typeof config.testEnvironmentOptions.testPath === 'string') {
+			this.testPath = config.testEnvironmentOptions.testPath;
+		}
+
+		this.testPath = this.initializeTestPath(config, context);
+
+		this.testFileName = basename(this.testPath);
+
+		this.reporter = this.initializeAllureReporter(config);
+
+		this.global.allure = this.reporter.getImplementation();
+	}
+
+	initializeTestPath(config: Config.ProjectConfig, context: EnvironmentContext) {
+		let testPath = context.testPath ?? '';
+
+		if (typeof config.testEnvironmentOptions.testPath === 'string') {
+			testPath = testPath?.replace(config.testEnvironmentOptions.testPath, '');
+		}
+
+		if (typeof config.testEnvironmentOptions.testPath !== 'string') {
+			testPath = testPath?.replace(config.rootDir, '');
+		}
+
+		if (testPath.startsWith('/')) {
+			testPath = testPath.slice(1);
+		}
+
+		return testPath;
+	}
+
+	initializeAllureReporter(config: Config.ProjectConfig) {
 		const allureConfig: IAllureConfig = {
 			resultsDir: config.testEnvironmentOptions.resultsDir as string ?? 'allure-results'
 		};
 
-		this.testPath = context.testPath ? context.testPath.replace(config.rootDir, '') : '';
-
-		if (this.testPath.includes('/tests/')) {
-			this.testPath = this.testPath.split('tests/')[1];
-		}
-
-		if (this.testPath.includes('/__tests__/')) {
-			this.testPath = this.testPath.split('__tests__/')[1];
-		}
-
-		this.testFileName = basename(this.testPath);
-
-		this.docblockPragmas = context.docblockPragmas;
-
-		this.reporter = new AllureReporter({
+		return new AllureReporter({
 			allureRuntime: new AllureRuntime(allureConfig),
 			jiraUrl: config.testEnvironmentOptions?.jiraUrl as string,
 			tmsUrl: config.testEnvironmentOptions?.tmsUrl as string,
 			environmentInfo: config.testEnvironmentOptions?.environmentInfo as Record<string, any>,
 			categoryDefinitions: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
 		});
-
-		this.global.allure = this.reporter.getImplementation();
 	}
 
 	async setup() {

@@ -122,6 +122,7 @@ Options that can be passed into the `environmentOptions` property of your `jest.
 | tmsUrl              | Decorator that receives Allure test result objects.                                 | `undefined`        |
 | environmentInfo     | Key value pairs that will appear under the environment section of the Allure report | `{}`               |
 | categoryDefinitions | Array of custom categories you wish to see in the Allure report                     | `[]`               |
+| testPath | Path to your test files. This path will be subtracted from the Allure report when organizing tests into suites.                | `Jest.config.rootDir`               |
 
 ## 📈 DocBlocks
 

@@ -293,7 +293,7 @@ export default class AllureReporter {
 		}
 
 		if (!message) {
-			message = 'Unformatted error. Expand for more details.';
+			message = 'Error. Expand for more details.';
 			trace = error;
 		}
 
