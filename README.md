@@ -117,9 +117,9 @@ Options that can be passed into the `environmentOptions` property of your `jest.
 
 | Parameter           | Description                                                                         | Default            |
 | ------------------- | ----------------------------------------------------------------------------------- | ------------------ |
-| resultsDir          | File path where result files are written.                                           | `"allure-results"` |
-| jiraUrl             | Decorator that receives Allure test result objects.                                 | `undefined`        |
-| tmsUrl              | Decorator that receives Allure test result objects.                                 | `undefined`        |
+| resultsDir          | Path where Allure result files will be written.                                           | `"allure-results"` |
+| jiraUrl             | URL to Jira instance. Any `@issue` docblock pragmas will link to this URL.                                 | `undefined`        |
+| tmsUrl              | URL to TMS instance. Any `@tms` docblock pragmas will link to this URL.                                 | `undefined`        |
 | environmentInfo     | Key value pairs that will appear under the environment section of the Allure report | `{}`               |
 | categoryDefinitions | Array of custom categories you wish to see in the Allure report                     | `[]`               |
 | testPath | Path to your test files. This path will be subtracted from the Allure report when organizing tests into suites.                | `Jest.config.rootDir`               |
