@@ -56,7 +56,7 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 			jiraUrl: config.testEnvironmentOptions?.jiraUrl as string,
 			tmsUrl: config.testEnvironmentOptions?.tmsUrl as string,
 			environmentInfo: config.testEnvironmentOptions?.environmentInfo as Record<string, any>,
-			categoryDefinitions: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
+			categories: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
 		});
 	}
 

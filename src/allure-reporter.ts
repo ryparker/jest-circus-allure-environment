@@ -1,30 +1,26 @@
-import type * as jest from '@jest/types';
 import * as os from 'os';
-
 import {
 	AllureGroup,
 	AllureRuntime,
 	AllureStep,
 	AllureTest,
 	Category,
-	ContentType,
 	ExecutableItemWrapper,
 	LabelName,
 	LinkType,
 	Stage,
-	Status,
-	StatusDetails
+	Status
 } from 'allure-js-commons';
-
 import JestAllureInterface from './jest-allure-interface';
 import {createHash} from 'crypto';
-import defaultCategoryDefinitions from './category-definitions';
+import defaultCategories from './category-definitions';
 import {parseWithComments} from 'jest-docblock';
-
 import stripAnsi = require('strip-ansi');
 import _ = require('lodash');
 import prettier = require('prettier/standalone');
 import parser = require('prettier/parser-typescript');
+import type {ContentType} from './types';
+import type * as jest from '@jest/types';
 
 export default class AllureReporter {
 	currentExecutable: ExecutableItemWrapper | null = null;
@@ -34,14 +30,14 @@ export default class AllureReporter {
 	private readonly tests: AllureTest[] = [];
 	private readonly jiraUrl: string;
 	private readonly tmsUrl: string;
-	private readonly categoryDefinitions: Category[] = defaultCategoryDefinitions;
+	private readonly categories: Category[] = defaultCategories;
 
 	constructor(options: {
 		allureRuntime: AllureRuntime;
 		jiraUrl?: string;
 		tmsUrl?: string;
 		environmentInfo?: Record<string, string>;
-		categoryDefinitions?: Category[];
+		categories?: Category[];
 	}) {
 		this.allureRuntime = options.allureRuntime;
 
@@ -53,14 +49,14 @@ export default class AllureReporter {
 			this.allureRuntime.writeEnvironmentInfo(options.environmentInfo);
 		}
 
-		if (options.categoryDefinitions) {
-			this.categoryDefinitions = [
-				...this.categoryDefinitions,
-				...options.categoryDefinitions
+		if (options.categories) {
+			this.categories = [
+				...this.categories,
+				...options.categories
 			];
 		}
 
-		this.allureRuntime.writeCategoriesDefinitions(this.categoryDefinitions);
+		this.allureRuntime.writeCategoriesDefinitions(this.categories);
 	}
 
 	getImplementation(): JestAllureInterface {

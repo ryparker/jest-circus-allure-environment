@@ -1,6 +1,5 @@
 # Jest Circus Allure Environment
 
-[![npm version](https://badge.fury.io/js/jest-circus-allure-environment.svg)](https://badge.fury.io/js/jest-circus-allure-environment)
 [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
 ![Lint-Build-Test-Publish](https://github.com/ryparker/jest-circus-allure-reporter/workflows/Lint-Build-Test-Publish/badge.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
@@ -115,14 +114,14 @@ _See the [setupFilesAfterEnv docs](https://jestjs.io/docs/en/configuration#setup
 
 Options that can be passed into the `environmentOptions` property of your `jest.config.js`
 
-| Parameter           | Description                                                                         | Default            |
-| ------------------- | ----------------------------------------------------------------------------------- | ------------------ |
-| resultsDir          | Path where Allure result files will be written.                                           | `"allure-results"` |
-| jiraUrl             | URL to Jira instance. Any `@issue` docblock pragmas will link to this URL.                                 | `undefined`        |
-| tmsUrl              | URL to TMS instance. Any `@tms` docblock pragmas will link to this URL.                                 | `undefined`        |
-| environmentInfo     | Key value pairs that will appear under the environment section of the Allure report | `{}`               |
-| categoryDefinitions | Array of custom categories you wish to see in the Allure report                     | `[]`               |
-| testPath | Path to your test files. This path will be subtracted from the Allure report when organizing tests into suites.                | `Jest.config.rootDir`               |
+| Parameter       | Description                                                                                                      | Default               |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------- |
+| resultsDir      | Path where Allure result files will be written.                                                                  | `"allure-results"`    |
+| jiraUrl         | URL to Jira instance. Any `@issue` docblock pragmas will link to this URL.                                       | `undefined`           |
+| tmsUrl          | URL to TMS instance. Any `@tms` docblock pragmas will link to this URL.                                          | `undefined`           |
+| environmentInfo | Key value pairs that will appear under the environment section of the Allure report                              | `{}`                  |
+| categories      | Array of custom categories you wish to see in the Allure report. [See an example](./src/category-definitions.ts) | `[]`                  |
+| testPath        | Path to your test files. This path will be subtracted from the Allure report when organizing tests into suites.  | `Jest.config.rootDir` |
 
 ## 📈 DocBlocks
 

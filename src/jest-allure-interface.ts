@@ -3,7 +3,6 @@ import {
 	AllureRuntime,
 	AllureStep,
 	AllureTest,
-	ContentType,
 	ExecutableItemWrapper,
 	LabelName,
 	LinkType,
@@ -12,9 +11,9 @@ import {
 	StepInterface,
 	isPromise
 } from 'allure-js-commons';
-
-import type AllureReporter from './allure-reporter';
 import StepWrapper from './step-wrapper';
+import type AllureReporter from './allure-reporter';
+import type {ContentType} from './types';
 
 export default class JestAllureInterface extends Allure {
 	public jiraUrl: string;
