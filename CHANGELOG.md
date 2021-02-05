@@ -1,5 +1,17 @@
 # Changelog
 
+# [1.0.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.14.0...v1.0.0) (2021-02-05)
+
+
+### Bug Fixes
+
+* **types.ts:** added HTML to the `ContentType` enum & renamed `categoryDefinitions` -> `categories` ([93c9925](https://github.com/ryparker/jest-circus-allure-environment/commit/93c9925d2f702f02ab8a9a99fcfd52c0438a91e3)), closes [#153](https://github.com/ryparker/jest-circus-allure-environment/issues/153)
+
+
+### BREAKING CHANGES
+
+* **types.ts:** Renamed environment option `categoryDefinitions` to `categories`
+
 # [0.14.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.13.6...v0.14.0) (2021-01-02)
 
 
