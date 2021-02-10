@@ -37,8 +37,8 @@ export enum ContentType {
 }
 
 export default class JestAllureInterface extends Allure {
-	public jiraUrl: string;
-	public tmsUrl = '';
+	jiraUrl: string;
+	tmsUrl = '';
 
 	constructor(
 		private readonly reporter: AllureReporter,
@@ -49,7 +49,7 @@ export default class JestAllureInterface extends Allure {
 		this.jiraUrl = jiraUrl ?? '';
 	}
 
-	public get currentExecutable(): AllureStep | AllureTest | ExecutableItemWrapper {
+	get currentExecutable(): AllureStep | AllureTest | ExecutableItemWrapper {
 		const executable: AllureStep | AllureTest | ExecutableItemWrapper | null =
       this.reporter.currentStep ??
       this.reporter.currentTest ??
@@ -62,57 +62,57 @@ export default class JestAllureInterface extends Allure {
 		return executable;
 	}
 
-	public set currentExecutable(executable: AllureStep | AllureTest | ExecutableItemWrapper) {
+	set currentExecutable(executable: AllureStep | AllureTest | ExecutableItemWrapper) {
 		this.reporter.currentExecutable = executable;
 	}
 
-	public label(name: string, value: string) {
+	label(name: string, value: string) {
 		this.currentTest.addLabel(name, value);
 	}
 
-	public severity(severity: Severity) {
+	severity(severity: Severity) {
 		this.label(LabelName.SEVERITY, severity);
 	}
 
-	public tag(tag: string) {
+	tag(tag: string) {
 		this.currentTest.addLabel(LabelName.TAG, tag);
 	}
 
-	public owner(owner: string) {
+	owner(owner: string) {
 		this.label(LabelName.OWNER, owner);
 	}
 
-	public lead(lead: string) {
+	lead(lead: string) {
 		this.label(LabelName.LEAD, lead);
 	}
 
-	public epic(epic: string) {
+	epic(epic: string) {
 		this.label(LabelName.EPIC, epic);
 	}
 
-	public feature(feature: string) {
+	feature(feature: string) {
 		this.label(LabelName.FEATURE, feature);
 	}
 
-	public story(story: string) {
+	story(story: string) {
 		this.label(LabelName.STORY, story);
 	}
 
-	public issue(name: string) {
+	issue(name: string) {
 		this.link(this.jiraUrl, name, LinkType.ISSUE);
 	}
 
-	public tms(name: string) {
+	tms(name: string) {
 		this.link(this.tmsUrl, name, LinkType.TMS);
 	}
 
-	public startStep(name: string): StepWrapper {
+	startStep(name: string): StepWrapper {
 		const allureStep: AllureStep = this.currentExecutable.startStep(name);
 		this.reporter.pushStep(allureStep);
 		return new StepWrapper(this.reporter, allureStep);
 	}
 
-	public async step<T>(name: string, body: (step: StepInterface) => any): Promise<any> {
+	async step<T>(name: string, body: (step: StepInterface) => any): Promise<any> {
 		const wrappedStep = this.startStep(name);
 		let result;
 		try {
@@ -129,14 +129,17 @@ export default class JestAllureInterface extends Allure {
 				const resolved = await promise;
 				wrappedStep.endStep();
 				return resolved;
-			} catch (error: any) {
+			} catch (error: unknown) {
 				wrappedStep.endStep();
 				throw error;
 			}
 		}
+
+		wrappedStep.endStep();
+		return result;
 	}
 
-	public logStep(
+	logStep(
 		name: string,
 		status: Status,
 		attachments?: Array<{ name: string; content: string; type: ContentType }>
@@ -154,7 +157,7 @@ export default class JestAllureInterface extends Allure {
 		step.endStep();
 	}
 
-	public description(markdown: string) {
+	description(markdown: string) {
 		const {currentTest} = this.reporter;
 
 		if (!currentTest) {
@@ -164,7 +167,7 @@ export default class JestAllureInterface extends Allure {
 		currentTest.description = markdown;
 	}
 
-	public descriptionHtml(html: string) {
+	descriptionHtml(html: string) {
 		const {currentTest} = this.reporter;
 
 		if (!currentTest) {
@@ -174,7 +177,7 @@ export default class JestAllureInterface extends Allure {
 		currentTest.descriptionHtml = html;
 	}
 
-	public attachment(
+	attachment(
 		name: string,
 		content: Buffer | string,
 		type: ContentType
@@ -183,7 +186,7 @@ export default class JestAllureInterface extends Allure {
 		this.currentExecutable.addAttachment(name, type, file);
 	}
 
-	public testAttachment(
+	testAttachment(
 		name: string,
 		content: Buffer | string,
 		type: ContentType
@@ -192,7 +195,7 @@ export default class JestAllureInterface extends Allure {
 		this.currentTest.addAttachment(name, type, file);
 	}
 
-	public get currentTest(): AllureTest {
+	get currentTest(): AllureTest {
 		if (this.reporter.currentTest === null) {
 			throw new Error('No test running!');
 		}
