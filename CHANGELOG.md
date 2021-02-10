@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.0...v1.0.1) (2021-02-10)
+
+
+### Bug Fixes
+
+* **contenttype:** fixed ContentType export and ability to attach HTML docs ([cbf2c5f](https://github.com/ryparker/jest-circus-allure-environment/commit/cbf2c5ff3b2fe4ee666902154d967d1b5f9bd63d)), closes [#155](https://github.com/ryparker/jest-circus-allure-environment/issues/155)
+
 # [1.0.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v0.14.0...v1.0.0) (2021-02-05)
 
 
