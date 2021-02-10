@@ -11,7 +11,7 @@ import {
 	Stage,
 	Status
 } from 'allure-js-commons';
-import JestAllureInterface from './jest-allure-interface';
+import JestAllureInterface, {ContentType} from './jest-allure-interface';
 import {createHash} from 'crypto';
 import defaultCategories from './category-definitions';
 import {parseWithComments} from 'jest-docblock';
@@ -19,7 +19,7 @@ import stripAnsi = require('strip-ansi');
 import _ = require('lodash');
 import prettier = require('prettier/standalone');
 import parser = require('prettier/parser-typescript');
-import type {ContentType} from './types';
+
 import type * as jest from '@jest/types';
 
 export default class AllureReporter {
@@ -228,7 +228,9 @@ export default class AllureReporter {
 	}
 
 	writeAttachment(content: Buffer | string, type: ContentType): string {
-		return this.allureRuntime.writeAttachment(content, type);
+		// Because Allure-JS-Commons does not support HTML we can workaround by providing the file extension.
+		const fileExtension = type === ContentType.HTML ? 'html' : undefined;
+		return this.allureRuntime.writeAttachment(content, {contentType: type, fileExtension});
 	}
 
 	pushStep(step: AllureStep): void {

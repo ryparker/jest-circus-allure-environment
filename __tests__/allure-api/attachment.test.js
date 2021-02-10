@@ -12,10 +12,15 @@ test('allure.attachment()', () => {
 			function: () => console.log('Ok it works.')
 		}, null, 2),
 		ContentType.JSON);
-	// Allure.attachment('JPEG-attachment', ContentType.JPEG, '');
-	// Allure.attachment('PNG-attachment', ContentType.PNG, '');
-	// allure.attachment('SVG attachment', ContentType.SVG, '');
+	allure.attachment('JPEG-attachment', '', ContentType.JPEG);
+	allure.attachment('PNG-attachment', '', ContentType.PNG);
+	allure.attachment('SVG attachment', '', ContentType.SVG);
+	allure.attachment('HTML attachment', '<div><p>This is an HTML doc</p></div', ContentType.HTML);
 
 	expect(1 + 2).toBe(3);
+});
+
+test('HTML is available on ContentType enum', () => {
+	expect(ContentType.HTML).toStrictEqual('text/html');
 });
 

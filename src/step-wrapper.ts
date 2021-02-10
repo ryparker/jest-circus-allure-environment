@@ -1,5 +1,5 @@
 import type {AllureStep, StepInterface, Stage} from 'allure-js-commons';
-import type {ContentType} from './types';
+import type {ContentType} from './jest-allure-interface';
 import {Status} from 'allure-js-commons';
 import type AllureReporter from './allure-reporter';
 

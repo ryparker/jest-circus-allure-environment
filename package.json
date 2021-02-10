@@ -29,6 +29,14 @@
     },
     "extends": [
       "plugin:jest/recommended"
+    ],
+    "overrides": [
+      {
+        "files": "src/jest-allure-interface.ts",
+        "rules": {
+          "@typescript-eslint/no-implicit-any-catch": 1
+        }
+      }
     ]
   },
   "husky": {

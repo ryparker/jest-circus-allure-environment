@@ -9,11 +9,32 @@ import {
 	Severity,
 	Status,
 	StepInterface,
-	isPromise
-} from 'allure-js-commons';
+	isPromise} from 'allure-js-commons';
+
 import StepWrapper from './step-wrapper';
 import type AllureReporter from './allure-reporter';
-import type {ContentType} from './types';
+
+/**
+ * Supported content types for Allure attachments.
+ *
+ * _This enum was copied and extended from allure-js-commons_
+ */
+export enum ContentType {
+	// Allure-js-commons ContentTypes:
+	TEXT = 'text/plain',
+	XML = 'application/xml',
+	CSV = 'text/csv',
+	TSV = 'text/tab-separated-values',
+	CSS = 'text/css',
+	URI = 'text/uri-list',
+	SVG = 'image/svg+xml',
+	PNG = 'image/png',
+	JSON = 'application/json',
+	WEBM = 'video/webm',
+	JPEG = 'image/jpeg',
+	// Custom extensions:
+	HTML = 'text/html'
+}
 
 export default class JestAllureInterface extends Allure {
 	public jiraUrl: string;
@@ -91,7 +112,7 @@ export default class JestAllureInterface extends Allure {
 		return new StepWrapper(this.reporter, allureStep);
 	}
 
-	public step<T>(name: string, body: (step: StepInterface) => any): any {
+	public async step<T>(name: string, body: (step: StepInterface) => any): Promise<any> {
 		const wrappedStep = this.startStep(name);
 		let result;
 		try {
@@ -104,19 +125,15 @@ export default class JestAllureInterface extends Allure {
 		if (isPromise(result)) {
 			const promise = result as Promise<any>;
 
-			return promise
-				.then(a => {
-					wrappedStep.endStep();
-					return a;
-				})
-				.catch(error => {
-					wrappedStep.endStep();
-					throw error;
-				});
+			try {
+				const resolved = await promise;
+				wrappedStep.endStep();
+				return resolved;
+			} catch (error: any) {
+				wrappedStep.endStep();
+				throw error;
+			}
 		}
-
-		wrappedStep.endStep();
-		return result;
 	}
 
 	public logStep(
