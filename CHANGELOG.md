@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.1...v1.0.2) (2021-02-10)
+
+
+### Bug Fixes
+
+* **jest-circus-allure.ts:** ending step and returning response as expected at end of step execution ([f8448cf](https://github.com/ryparker/jest-circus-allure-environment/commit/f8448cf2528f380609eefb63a514ef3e572f26c1)), closes [#155](https://github.com/ryparker/jest-circus-allure-environment/issues/155)
+
 ## [1.0.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.0...v1.0.1) (2021-02-10)
 
 
