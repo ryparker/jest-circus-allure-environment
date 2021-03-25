@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.2...v1.0.3) (2021-03-25)
+
+
+### Bug Fixes
+
+* **allure-reporter.ts:** resolve 'message' type on jest assertion errors ([3f0711c](https://github.com/ryparker/jest-circus-allure-environment/commit/3f0711caf84b2b32f998d15e5f8d780399125fc2))
+
 ## [1.0.2](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.1...v1.0.2) (2021-02-10)
 
 
