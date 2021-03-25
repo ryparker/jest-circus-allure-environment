@@ -269,7 +269,7 @@ export default class AllureReporter {
 
 		if (error.matcherResult) {
 			status = Status.FAILED;
-			const matcherMessage = error.matcherResult.message();
+			const matcherMessage = typeof error.matcherResult.message === 'function' ? error.matcherResult.message() : error.matcherResult.message;
 
 			const [line1, line2, ...restOfMessage] = matcherMessage.split('\n');
 
