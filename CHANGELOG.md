@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.1.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.3...v1.1.0) (2021-03-31)
+
+
+### Features
+
+* **attachments:** added support for new `AttachmentOption` param and removed `crypto` dep ([cb8df94](https://github.com/ryparker/jest-circus-allure-environment/commit/cb8df94c7e7204c7039aef17df3e983c7244d92c)), closes [#176](https://github.com/ryparker/jest-circus-allure-environment/issues/176) [#175](https://github.com/ryparker/jest-circus-allure-environment/issues/175)
+
 ## [1.0.3](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.2...v1.0.3) (2021-03-25)
 
 
