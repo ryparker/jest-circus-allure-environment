@@ -3,6 +3,7 @@ import {
 	AllureGroup,
 	AllureRuntime,
 	AllureStep,
+	AttachmentOptions,
 	AllureTest,
 	Category,
 	ExecutableItemWrapper,
@@ -227,10 +228,16 @@ export default class AllureReporter {
 		this.popTest();
 	}
 
-	writeAttachment(content: Buffer | string, type: ContentType): string {
-		// Because Allure-JS-Commons does not support HTML we can workaround by providing the file extension.
-		const fileExtension = type === ContentType.HTML ? 'html' : undefined;
-		return this.allureRuntime.writeAttachment(content, {contentType: type, fileExtension});
+	writeAttachment(content: Buffer | string, type: ContentType | string | AttachmentOptions): string {
+		if (type === ContentType.HTML) {
+			// Allure-JS-Commons does not support HTML so we workaround this by providing the file extension.
+			return this.allureRuntime.writeAttachment(content, {
+				contentType: type,
+				fileExtension: 'html'
+			});
+		}
+
+		return this.allureRuntime.writeAttachment(content, type);
 	}
 
 	pushStep(step: AllureStep): void {

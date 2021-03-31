@@ -3,6 +3,7 @@ import {
 	AllureRuntime,
 	AllureStep,
 	AllureTest,
+	AttachmentOptions,
 	ExecutableItemWrapper,
 	LabelName,
 	LinkType,
@@ -142,7 +143,7 @@ export default class JestAllureInterface extends Allure {
 	logStep(
 		name: string,
 		status: Status,
-		attachments?: Array<{ name: string; content: string; type: ContentType }>
+		attachments?: Array<{ name: string; content: string; type: ContentType | string | AttachmentOptions }>
 	): void {
 		const step = this.startStep(name);
 
@@ -180,7 +181,7 @@ export default class JestAllureInterface extends Allure {
 	attachment(
 		name: string,
 		content: Buffer | string,
-		type: ContentType
+		type: ContentType | string | AttachmentOptions
 	): void {
 		const file = this.reporter.writeAttachment(content, type);
 		this.currentExecutable.addAttachment(name, type, file);
@@ -189,7 +190,7 @@ export default class JestAllureInterface extends Allure {
 	testAttachment(
 		name: string,
 		content: Buffer | string,
-		type: ContentType
+		type: ContentType | string | AttachmentOptions
 	): void {
 		const file = this.reporter.writeAttachment(content, type);
 		this.currentTest.addAttachment(name, type, file);
