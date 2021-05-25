@@ -4,13 +4,13 @@ import type {Circus, Config} from '@jest/types';
 import AllureReporter from './allure-reporter';
 import type {EnvironmentContext} from '@jest/environment';
 
-import NodeEnvironment = require('jest-environment-node');
 import {basename} from 'path';
 
-export default class AllureNodeEnvironment extends NodeEnvironment {
-	private readonly reporter: AllureReporter;
-	private readonly testPath: string;
-	private readonly testFileName: string;
+const extendAllureBaseEnvironment = (environmentToExtend: any) => class AllureBaseEnvironment extends environmentToExtend {
+	global: any;
+	reporter: AllureReporter;
+	testPath: string;
+	testFileName: string;
 
 	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 		super(config);
@@ -230,4 +230,6 @@ export default class AllureNodeEnvironment extends NodeEnvironment {
 				break;
 		}
 	}
-}
+};
+
+export default extendAllureBaseEnvironment;
