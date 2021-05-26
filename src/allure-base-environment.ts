@@ -2,234 +2,237 @@ import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
 import type {Circus, Config} from '@jest/types';
 
 import AllureReporter from './allure-reporter';
-import type {EnvironmentContext} from '@jest/environment';
+import type {EnvironmentContext, JestEnvironment} from '@jest/environment';
 
 import {basename} from 'path';
 
-const extendAllureBaseEnvironment = (environmentToExtend: any) => class AllureBaseEnvironment extends environmentToExtend {
-	global: any;
-	reporter: AllureReporter;
-	testPath: string;
-	testFileName: string;
+function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base: TBase): TBase {
+	// @ts-expect-error (ts(2545)) Incorrect assumption about a mixin class: https://github.com/microsoft/TypeScript/issues/37142
+	return class AllureBaseEnvironment extends Base {
+		global: any;
+		reporter: AllureReporter;
+		testPath: string;
+		testFileName: string;
 
-	constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
-		super(config);
+		constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
+			super(config, context);
 
-		if (typeof config.testEnvironmentOptions.testPath === 'string') {
-			this.testPath = config.testEnvironmentOptions.testPath;
+			if (typeof config.testEnvironmentOptions.testPath === 'string') {
+				this.testPath = config.testEnvironmentOptions.testPath;
+			}
+
+			this.testPath = this.initializeTestPath(config, context);
+
+			this.testFileName = basename(this.testPath);
+
+			this.reporter = this.initializeAllureReporter(config);
+
+			this.global.allure = this.reporter.getImplementation();
 		}
 
-		this.testPath = this.initializeTestPath(config, context);
+		initializeTestPath(config: Config.ProjectConfig, context: EnvironmentContext) {
+			let testPath = context.testPath ?? '';
 
-		this.testFileName = basename(this.testPath);
+			if (typeof config.testEnvironmentOptions.testPath === 'string') {
+				testPath = testPath?.replace(config.testEnvironmentOptions.testPath, '');
+			}
 
-		this.reporter = this.initializeAllureReporter(config);
+			if (typeof config.testEnvironmentOptions.testPath !== 'string') {
+				testPath = testPath?.replace(config.rootDir, '');
+			}
 
-		this.global.allure = this.reporter.getImplementation();
-	}
+			if (testPath.startsWith('/')) {
+				testPath = testPath.slice(1);
+			}
 
-	initializeTestPath(config: Config.ProjectConfig, context: EnvironmentContext) {
-		let testPath = context.testPath ?? '';
-
-		if (typeof config.testEnvironmentOptions.testPath === 'string') {
-			testPath = testPath?.replace(config.testEnvironmentOptions.testPath, '');
+			return testPath;
 		}
 
-		if (typeof config.testEnvironmentOptions.testPath !== 'string') {
-			testPath = testPath?.replace(config.rootDir, '');
+		initializeAllureReporter(config: Config.ProjectConfig) {
+			const allureConfig: IAllureConfig = {
+				resultsDir: config.testEnvironmentOptions.resultsDir as string ?? 'allure-results'
+			};
+
+			return new AllureReporter({
+				allureRuntime: new AllureRuntime(allureConfig),
+				jiraUrl: config.testEnvironmentOptions?.jiraUrl as string,
+				tmsUrl: config.testEnvironmentOptions?.tmsUrl as string,
+				environmentInfo: config.testEnvironmentOptions?.environmentInfo as Record<string, any>,
+				categories: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
+			});
 		}
 
-		if (testPath.startsWith('/')) {
-			testPath = testPath.slice(1);
+		async setup() {
+			return super.setup();
 		}
 
-		return testPath;
-	}
+		async teardown() {
+			return super.teardown();
+		}
 
-	initializeAllureReporter(config: Config.ProjectConfig) {
-		const allureConfig: IAllureConfig = {
-			resultsDir: config.testEnvironmentOptions.resultsDir as string ?? 'allure-results'
-		};
+		handleTestEvent(event: Circus.Event, state: Circus.State) {
+			// Console.log(`Event: ${event.name}`);
+			// Console.log({event});
 
-		return new AllureReporter({
-			allureRuntime: new AllureRuntime(allureConfig),
-			jiraUrl: config.testEnvironmentOptions?.jiraUrl as string,
-			tmsUrl: config.testEnvironmentOptions?.tmsUrl as string,
-			environmentInfo: config.testEnvironmentOptions?.environmentInfo as Record<string, any>,
-			categories: config.testEnvironmentOptions?.categories as Array<Record<string, any>>
-		});
-	}
+			switch (event.name) {
+				case 'setup':
 
-	async setup() {
-		return super.setup();
-	}
+					break;
+				case 'add_hook':
+					break;
+				case 'add_test':
+					break;
+				case 'run_start':
+					this.reporter.startTestFile(this.testFileName);
 
-	async teardown() {
-		return super.teardown();
-	}
+					break;
+				case 'test_skip':
+					this.reporter.startTestCase(event.test, state, this.testPath);
+					this.reporter.pendingTestCase(event.test);
 
-	handleTestEvent(event: Circus.Event, state: Circus.State) {
-		// Console.log(`Event: ${event.name}`);
-		// Console.log({event});
+					break;
+				case 'test_todo':
+					this.reporter.startTestCase(event.test, state, this.testPath);
+					this.reporter.pendingTestCase(event.test);
 
-		switch (event.name) {
-			case 'setup':
+					break;
+				case 'start_describe_definition':
+					/**
+					 * @privateRemarks
+					 * Only called if "describe()" blocks are present.
+					 */
 
-				break;
-			case 'add_hook':
-				break;
-			case 'add_test':
-				break;
-			case 'run_start':
-				this.reporter.startTestFile(this.testFileName);
+					break;
+				case 'finish_describe_definition':
+					/**
+					 * @privateRemarks
+					 * Only called if "describe()" blocks are present.
+					 */
 
-				break;
-			case 'test_skip':
-				this.reporter.startTestCase(event.test, state, this.testPath);
-				this.reporter.pendingTestCase(event.test);
+					break;
+				case 'run_describe_start':
+					/**
+					 * @privateRemarks
+					 * This is called at the start of a test file.
+					 * Even if there are no describe blocks.
+					 */
 
-				break;
-			case 'test_todo':
-				this.reporter.startTestCase(event.test, state, this.testPath);
-				this.reporter.pendingTestCase(event.test);
+					this.reporter.startSuite(event.describeBlock.name);
 
-				break;
-			case 'start_describe_definition':
-				/**
-				 * @privateRemarks
-				 * Only called if "describe()" blocks are present.
-				 */
+					break;
+				case 'test_start':
+					/**
+					 * @privateRemarks
+					 * This is called after beforeAll and before the beforeEach hooks.
+					 * If we start the test case here, allure will include the beforeEach
+					 * hook as part of the "test body" instead of the "Set up".
+					 */
 
-				break;
-			case 'finish_describe_definition':
-				/**
-				 * @privateRemarks
-				 * Only called if "describe()" blocks are present.
-				 */
+					// This.reporter.startTestCase(event.test, state, this.testPath);
+					break;
+				case 'hook_start':
+					this.reporter.startHook(event.hook.type);
 
-				break;
-			case 'run_describe_start':
-				/**
-				 * @privateRemarks
-				 * This is called at the start of a test file.
-				 * Even if there are no describe blocks.
-				 */
+					break;
+				case 'hook_success':
+					this.reporter.endHook();
 
-				this.reporter.startSuite(event.describeBlock.name);
+					break;
+				case 'hook_failure':
+					this.reporter.endHook(event.error ?? event.hook.asyncError);
 
-				break;
-			case 'test_start':
-				/**
-				 * @privateRemarks
-				 * This is called after beforeAll and before the beforeEach hooks.
-				 * If we start the test case here, allure will include the beforeEach
-				 * hook as part of the "test body" instead of the "Set up".
-				 */
+					break;
+				case 'test_fn_start':
+					/**
+					 * @privateRemarks
+					 * This is called after the beforeAll and after the beforeEach.
+					 * Making this the most reliable event to start the test case, so
+					 * that only the test context is captured in the allure
+					 * "Test body" execution.
+					 */
 
-				// This.reporter.startTestCase(event.test, state, this.testPath);
-				break;
-			case 'hook_start':
-				this.reporter.startHook(event.hook.type);
+					this.reporter.startTestCase(event.test, state, this.testPath);
 
-				break;
-			case 'hook_success':
-				this.reporter.endHook();
+					break;
+				case 'test_fn_success':
+					if (event.test.errors.length > 0) {
+						this.reporter.failTestCase(event.test.errors[0]);
+					} else {
+						this.reporter.passTestCase();
+					}
 
-				break;
-			case 'hook_failure':
-				this.reporter.endHook(event.error ?? event.hook.asyncError);
-
-				break;
-			case 'test_fn_start':
-				/**
-				 * @privateRemarks
-				 * This is called after the beforeAll and after the beforeEach.
-				 * Making this the most reliable event to start the test case, so
-				 * that only the test context is captured in the allure
-				 * "Test body" execution.
-				 */
-
-				this.reporter.startTestCase(event.test, state, this.testPath);
-
-				break;
-			case 'test_fn_success':
-				if (event.test.errors.length > 0) {
+					break;
+				case 'test_fn_failure':
 					this.reporter.failTestCase(event.test.errors[0]);
-				} else {
-					this.reporter.passTestCase();
-				}
 
-				break;
-			case 'test_fn_failure':
-				this.reporter.failTestCase(event.test.errors[0]);
+					break;
+				case 'test_done':
+					/**
+					 * @privateRemarks
+					 * This is called once the test has completed (includes hooks).
+					 * This is more reliable for error collection because some failures
+					 * like Snapshot failures will only appear in this event.
+					 */
+					/**
+					 * @privateRemarks -Issue-
+					 * If we capture errors from both test_done and test_fn_failure
+					 * the test case will be overriden causing allure to lose any
+					 * test context like steps that the overriden test case may have
+					 * had.
+					 * A workaround might be to refactor the AllureReporter class
+					 * by decoupling the endTestCase method from the passTestCase,
+					 * failTestCase, and pendingTestCase methods.
+					 */
+					/**
+					 * @privateRemarks -Issue-
+					 * afterEach hooks appears in the allure "test body".
+					 */
 
-				break;
-			case 'test_done':
-				/**
-				 * @privateRemarks
-				 * This is called once the test has completed (includes hooks).
-				 * This is more reliable for error collection because some failures
-				 * like Snapshot failures will only appear in this event.
-				 */
-				/**
-				 * @privateRemarks -Issue-
-				 * If we capture errors from both test_done and test_fn_failure
-				 * the test case will be overriden causing allure to lose any
-				 * test context like steps that the overriden test case may have
-				 * had.
-				 * A workaround might be to refactor the AllureReporter class
-				 * by decoupling the endTestCase method from the passTestCase,
-				 * failTestCase, and pendingTestCase methods.
-				 */
-				/**
-				 * @privateRemarks -Issue-
-				 * afterEach hooks appears in the allure "test body".
-				 */
+					if (event.test.errors.length > 0) {
+						this.reporter.failTestCase(event.test.errors[0]);
+					}
 
-				if (event.test.errors.length > 0) {
-					this.reporter.failTestCase(event.test.errors[0]);
-				}
+					this.reporter.endTest();
 
-				this.reporter.endTest();
+					break;
+				case 'run_describe_finish':
+					/**
+					 * @privateRemarks
+					 * This is called at the end of a describe block or test file. If a
+					 * describe block is not present in the test file, this event will
+					 * still be called at the end of the test file.
+					 */
 
-				break;
-			case 'run_describe_finish':
-				/**
-				 * @privateRemarks
-				 * This is called at the end of a describe block or test file. If a
-				 * describe block is not present in the test file, this event will
-				 * still be called at the end of the test file.
-				 */
+					this.reporter.endSuite();
 
-				this.reporter.endSuite();
+					break;
+				case 'run_finish':
+					this.reporter.endTestFile();
 
-				break;
-			case 'run_finish':
-				this.reporter.endTestFile();
+					break;
+				case 'teardown':
+					break;
+				case 'error':
+					/**
+					 * @privateRemarks
+					 * Haven't found a good example of when this is emitted yet.
+					 */
 
-				break;
-			case 'teardown':
-				break;
-			case 'error':
-				/**
-				 * @privateRemarks
-				 * Haven't found a good example of when this is emitted yet.
-				 */
+					// console.log('ERROR EVENT:', event);
 
-				// console.log('ERROR EVENT:', event);
+					break;
+				default:
+					/**
+					 * @privateRemarks
+					 * Haven't found a good example of when this is emitted yet.
+					*/
 
-				break;
-			default:
-				/**
-				 * @privateRemarks
-				 * Haven't found a good example of when this is emitted yet.
-				*/
+					// console.log('UNHANDLED EVENT:', event);
 
-				// console.log('UNHANDLED EVENT:', event);
-
-				break;
+					break;
+			}
 		}
-	}
-};
+	};
+}
 
 export default extendAllureBaseEnvironment;
