@@ -10,9 +10,9 @@ function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base:
 	// @ts-expect-error (ts(2545)) Incorrect assumption about a mixin class: https://github.com/microsoft/TypeScript/issues/37142
 	return class AllureBaseEnvironment extends Base {
 		global: any;
-		reporter: AllureReporter;
-		testPath: string;
-		testFileName: string;
+		private readonly reporter: AllureReporter;
+		private readonly testPath: string;
+		private readonly testFileName: string;
 
 		constructor(config: Config.ProjectConfig, context: EnvironmentContext) {
 			super(config, context);
