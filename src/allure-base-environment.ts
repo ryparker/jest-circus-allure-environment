@@ -230,7 +230,7 @@ function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base:
 
 					break;
 			}
-		}
+		};
 	};
 }
 
