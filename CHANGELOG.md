@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.1.0...v1.1.1) (2021-06-02)
+
+
+### Bug Fixes
+
+* **(xo linter):** fixed linter errors ([70e6e01](https://github.com/ryparker/jest-circus-allure-environment/commit/70e6e0157a911d6d87aa6dd7e3d99450ac487181))
+
 # [1.1.0](https://github.com/ryparker/jest-circus-allure-environment/compare/v1.0.3...v1.1.0) (2021-03-31)
 
 
