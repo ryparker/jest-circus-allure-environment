@@ -143,16 +143,16 @@ export default class JestAllureInterface extends Allure {
 	logStep(
 		name: string,
 		status: Status,
-		attachments?: Array<{ name: string; content: string; type: ContentType | string | AttachmentOptions }>
+		attachments?: Array<{name: string; content: string; type: ContentType | string | AttachmentOptions}>
 	): void {
 		const step = this.startStep(name);
 
 		step.status = status;
 
 		if (attachments) {
-			attachments.forEach(a => {
+			for (const a of attachments) {
 				this.attachment(a.name, a.content, a.type);
-			});
+			}
 		}
 
 		step.endStep();

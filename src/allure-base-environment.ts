@@ -1,10 +1,9 @@
+import {basename} from 'path';
 import {AllureRuntime, IAllureConfig} from 'allure-js-commons';
 import type {Circus, Config} from '@jest/types';
 
-import AllureReporter from './allure-reporter';
 import type {EnvironmentContext, JestEnvironment} from '@jest/environment';
-
-import {basename} from 'path';
+import AllureReporter from './allure-reporter';
 
 function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base: TBase): TBase {
 	// @ts-expect-error (ts(2545)) Incorrect assumption about a mixin class: https://github.com/microsoft/TypeScript/issues/37142
@@ -70,7 +69,7 @@ function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base:
 			return super.teardown();
 		}
 
-		handleTestEvent(event: Circus.Event, state: Circus.State) {
+		handleTestEvent = (event: Circus.Event, state: Circus.State) => {
 			// Console.log(`Event: ${event.name}`);
 			// Console.log({event});
 

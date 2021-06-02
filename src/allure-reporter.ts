@@ -1,3 +1,4 @@
+import {createHash} from 'crypto';
 import * as os from 'os';
 import {
 	AllureGroup,
@@ -12,9 +13,6 @@ import {
 	Stage,
 	Status
 } from 'allure-js-commons';
-import JestAllureInterface, {ContentType} from './jest-allure-interface';
-import {createHash} from 'crypto';
-import defaultCategories from './category-definitions';
 import {parseWithComments} from 'jest-docblock';
 import stripAnsi = require('strip-ansi');
 import _ = require('lodash');
@@ -22,6 +20,8 @@ import prettier = require('prettier/standalone');
 import parser = require('prettier/parser-typescript');
 
 import type * as jest from '@jest/types';
+import JestAllureInterface, {ContentType} from './jest-allure-interface';
+import defaultCategories from './category-definitions';
 
 export default class AllureReporter {
 	currentExecutable: ExecutableItemWrapper | null = null;
@@ -85,9 +85,9 @@ export default class AllureReporter {
 	}
 
 	endTestFile(): void {
-		this.suites.forEach(_ => {
+		for (const _ of this.suites) {
 			this.endSuite();
-		});
+		}
 	}
 
 	startSuite(suiteName?: string): void {
@@ -103,15 +103,15 @@ export default class AllureReporter {
 		}
 
 		if (this.steps.length > 0) {
-			this.steps.forEach(step => {
+			for (const step of this.steps) {
 				step.endStep();
-			});
+			}
 		}
 
 		if (this.tests.length > 0) {
-			this.tests.forEach(test => {
+			for (const test of this.tests) {
 				test.endTest();
-			});
+			}
 		}
 
 		this.currentSuite.endGroup();
@@ -329,16 +329,16 @@ export default class AllureReporter {
 		return match ? match[0].trimStart() : '';
 	}
 
-	private setAllureReportPragmas(currentTest: AllureTest, pragmas: Record<string, string|string[]>) {
+	private setAllureReportPragmas(currentTest: AllureTest, pragmas: Record<string, string | string[]>) {
 		for (let [pragma, value] of Object.entries(pragmas)) {
 			if (value instanceof String && value.includes(',')) {
 				value = value.split(',');
 			}
 
 			if (Array.isArray(value)) {
-				value.forEach(v => {
+				for (const v of value) {
 					this.setAllureLabelsAndLinks(currentTest, pragma, v);
-				});
+				}
 			}
 
 			if (!Array.isArray(value)) {
