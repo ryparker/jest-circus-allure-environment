@@ -376,7 +376,6 @@ export default class AllureReporter {
 		} else if ((parent?.parent as any)?.parent && (parent?.parent as any)?.parent.name === 'ROOT_DESCRIBE_BLOCK') {
 				currentTest.addLabel(LabelName.PARENT_SUITE, (parent.parent as any).name);
 				currentTest.addLabel(LabelName.SUITE, (parent as any).name);
-				// currentTest.addLabel(LabelName.SUB_SUITE, parent.name);
 		} else if ((parent as any)?.parent && (parent as any)?.parent.name === 'ROOT_DESCRIBE_BLOCK') {
 				currentTest.addLabel(LabelName.PARENT_SUITE, (parent as any).name);
 		}
