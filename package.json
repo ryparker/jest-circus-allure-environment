@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@jest/environment": "^27.0.3",
-    "@jest/reporters": "^27.0.2",
+    "@jest/reporters": "^27.3.1",
     "@jest/types": "^27.0.2",
     "allure-js-commons": "2.0.0-beta.9",
     "ansi_up": "^5.0.1",
