@@ -1,7 +1,10 @@
 {
-  "name": "jest-circus-allure-environment",
+  "name": "@alex_neo/jest-circus-allure-environment",
   "version": "1.2.0",
-  "repository": "https://github.com/ryparker/jest-circus-allure-environment.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryparker/jest-circus-allure-environment.git"
+  },
   "author": "Ryan Parker <ryan.parker3@outlook.com>",
   "license": "MIT",
   "files": [
@@ -130,5 +133,10 @@
     "reports",
     "collect",
     "analyze"
-  ]
+  ],
+  "description": "[![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)\r ![Lint-Build-Test-Publish](https://github.com/ryparker/jest-circus-allure-reporter/workflows/Lint-Build-Test-Publish/badge.svg)\r [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)\r [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)\r [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)",
+  "bugs": {
+    "url": "https://github.com/ryparker/jest-circus-allure-environment/issues"
+  },
+  "homepage": "https://github.com/ryparker/jest-circus-allure-environment#readme"
 }
