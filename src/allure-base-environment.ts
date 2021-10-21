@@ -100,13 +100,15 @@ function extendAllureBaseEnvironment<TBase extends typeof JestEnvironment>(Base:
 					 * @privateRemarks
 					 * Only called if "describe()" blocks are present.
 					 */
-
+					console.log('start_describe_definition', event)
+					
 					break;
 				case 'finish_describe_definition':
-					/**
-					 * @privateRemarks
-					 * Only called if "describe()" blocks are present.
-					 */
+						/**
+						 * @privateRemarks
+						 * Only called if "describe()" blocks are present.
+						 */
+						console.log('finish_describe_definition', event)
 
 					break;
 				case 'run_describe_start':
