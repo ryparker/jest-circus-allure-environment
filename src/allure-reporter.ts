@@ -178,7 +178,7 @@ export default class AllureReporter {
 			currentTest.addLabel(LabelName.THREAD, state.parentProcess.env.JEST_WORKER_ID);
 		}
 
-		currentTest = this.addSuiteLabelsToTestCase(currentTest, testPath);
+		currentTest = this.addSuiteLabelsToTestCase(currentTest, test.parent, testPath);
 		this.pushTest(currentTest);
 	}
 
@@ -369,7 +369,7 @@ export default class AllureReporter {
 		}
 	}
 
-	private addSuiteLabelsToTestCase(currentTest: AllureTest, testPath: string): AllureTest {
+	private addSuiteLabelsToTestCase(currentTest: AllureTest, parent: jest.Circus.DescribeBlock, testPath: string): AllureTest {
 		const isWindows = os.type() === 'Windows_NT';
 		const pathDelimiter = isWindows ? '\\' : '/';
 		const pathsArray = testPath.split(pathDelimiter);
@@ -377,19 +377,28 @@ export default class AllureReporter {
 		const [parentSuite, ...suites] = pathsArray;
 		const subSuite = suites.pop();
 
-		if (parentSuite) {
-			currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
-			currentTest.addLabel(LabelName.PACKAGE, parentSuite);
+		if ((parent?.parent as any)?.parent?.parent && (parent?.parent as any)?.parent?.parent.name === 'ROOT_DESCRIBE_BLOCK') {
+			currentTest.addLabel(LabelName.PARENT_SUITE, (parent.parent as any).parent.name);
+			currentTest.addLabel(LabelName.SUITE, (parent.parent as any).name);
+			currentTest.addLabel(LabelName.SUB_SUITE, parent.name);
+		} else if ((parent?.parent as any)?.parent && (parent?.parent as any)?.parent.name === 'ROOT_DESCRIBE_BLOCK') {
+			currentTest.addLabel(LabelName.PARENT_SUITE, (parent.parent as any).name);
+			currentTest.addLabel(LabelName.SUITE, (parent as any).name);
+		} else if ((parent as any)?.parent && (parent as any)?.parent.name === 'ROOT_DESCRIBE_BLOCK') {
+			currentTest.addLabel(LabelName.PARENT_SUITE, (parent as any).name);
+		} else {
+			if (parentSuite) {
+				currentTest.addLabel(LabelName.PARENT_SUITE, parentSuite);
+				currentTest.addLabel(LabelName.PACKAGE, parentSuite);
+			}
+			if (suites.length > 0) {
+				currentTest.addLabel(LabelName.SUITE, suites.join(' > '));
+			}
+			if (subSuite) {
+				currentTest.addLabel(LabelName.SUB_SUITE, subSuite);
+			}
 		}
-
-		if (suites.length > 0) {
-			currentTest.addLabel(LabelName.SUITE, suites.join(' > '));
-		}
-
-		if (subSuite) {
-			currentTest.addLabel(LabelName.SUB_SUITE, subSuite);
-		}
-
+		 
 		return currentTest;
 	}
 
